@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matt's Puzzle</title>
-    <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=block" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -387,6 +387,22 @@
         @keyframes confetti-fall {
             to {
                 transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .streamer {
+            position: fixed;
+            font-size: 32px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes streamer-fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
                 opacity: 0;
             }
         }
@@ -777,7 +793,7 @@
 
         .word-cell.shared {
             box-shadow: inset 0 -6px 0 rgba(0,0,0,0.04);
-            background: linear-gradient(180deg, #d8f6e9 0%, #a8e8c8 100%);
+            background: linear-gradient(180deg, #a8cdbd 0%, #386b52 100%);
             color: #0a5a33;
         }
 
@@ -1274,11 +1290,12 @@
             if (emptyTile) emptyTile.style.backgroundImage = "url('images/tile-3.png')";
             puzzleContainer.classList.add('completed');
             puzzleGrid.classList.add('merging');
+            runStreamersFor(2000);
             setTimeout(() => {
                 puzzleFullImageOverlay.classList.add('show');
                 setTimeout(() => {
                     puzzleGridWrap.classList.add('revealing');
-                    // Immediately proceed to the wordsearch view (second puzzle)
+                    // Pause to admire the photo longer before proceeding to the wordsearch view
                     puzzleView.classList.remove('visible');
                     requestAnimationFrame(() => {
                         requestAnimationFrame(() => {
@@ -1287,7 +1304,7 @@
                             initWordsearch();
                         });
                     });
-                }, 250);
+                }, 3000);
             }, 280);
         }
         
@@ -1801,6 +1818,7 @@
 
         function completeWordsearch() {
             // hide the wordsearch and show the question view
+            runStreamersFor(2000);
             const wordsearchView = document.getElementById('wordsearchView');
             if (wordsearchView) wordsearchView.classList.remove('visible');
             if (questionView) questionView.classList.add('visible');
@@ -1829,6 +1847,30 @@
             confetti.style.animation = `confetti-fall ${duration}s linear`;
             document.body.appendChild(confetti);
             setTimeout(() => confetti.remove(), (duration + 0.5) * 1000);
+        }
+
+        function runStreamersFor(ms) {
+            const end = Date.now() + ms;
+            function tick() {
+                if (Date.now() < end) {
+                    createStreamer();
+                    setTimeout(tick, 100);
+                }
+            }
+            tick();
+        }
+
+        function createStreamer() {
+            const streamer = document.createElement('div');
+            streamer.className = 'streamer';
+            const emojis = ['💋', '💕', '✨', '🎀'];
+            streamer.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            streamer.style.left = Math.random() * 95 + '%';
+            streamer.style.top = '-50px';
+            const duration = 3 + Math.random() * 1.5;
+            streamer.style.animation = `streamer-fall ${duration}s ease-in`;
+            document.body.appendChild(streamer);
+            setTimeout(() => streamer.remove(), (duration + 0.2) * 1000);
         }
     </script>
 </body>
