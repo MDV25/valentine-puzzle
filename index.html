@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EC&MV Oct 25</title>
+    <title>Matt's Puzzle</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -194,6 +195,24 @@
             margin-bottom: 32px;
         }
 
+        #successView .modal-title {
+            font-size: 120px;
+            font-family: 'Pinyon Script', cursive;
+            color: white;
+            font-weight: 700;
+            margin: 0 auto;
+            padding: 40px 20px;
+            line-height: 1.1;
+            text-shadow: 
+                0 0 20px rgba(196, 30, 58, 0.8),
+                0 0 40px rgba(196, 30, 58, 0.6),
+                2px 2px 8px rgba(196, 30, 58, 0.7),
+                4px 4px 12px rgba(196, 30, 58, 0.5);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
         .puzzle-container {
             width: 40vh;
             max-width: 100%;
@@ -358,9 +377,11 @@
 
         .confetti {
             position: fixed;
-            width: 10px;
-            height: 10px;
+            font-size: 24px;
             pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         @keyframes confetti-fall {
@@ -438,6 +459,10 @@
             .modal-view .modal-title {
                 font-size: 20px;
             }
+            #successView .modal-title {
+                font-size: 72px;
+                margin-bottom: 40px;
+            }
             .puzzle-reveal-text .complete-line,
             .puzzle-reveal-text .valentine-question {
                 font-size: 18px;
@@ -465,6 +490,10 @@
             .modal-view .modal-title {
                 font-size: 18px;
             }
+            #successView .modal-title {
+                font-size: 56px;
+                margin-bottom: 30px;
+            }
             .puzzle-reveal-text .complete-line,
             .puzzle-reveal-text .valentine-question {
                 font-size: 16px;
@@ -490,6 +519,10 @@
             }
             .modal-view .modal-title {
                 font-size: 16px;
+            }
+            #successView .modal-title {
+                font-size: 44px;
+                margin-bottom: 20px;
             }
             .puzzle-reveal-text .complete-line,
             .puzzle-reveal-text .valentine-question {
@@ -564,6 +597,16 @@
             background: transparent;
             box-shadow: none;
             padding: 24px;
+            position: relative;
+        }
+
+        .container.container--success::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: #FFDAE9;
+            z-index: -2;
+            pointer-events: none;
         }
 
         /* Success: Yay + gif + Reset */
@@ -587,21 +630,185 @@
             height: auto;
         }
 
+        /* Photo tape background: vertically scrolling columns of photos */
+        .photo-tape-bg {
+            position: fixed;
+            inset: 0;
+            background: #FFDAE9;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .photo-tape-columns {
+            display: flex;
+            width: 100%;
+            gap: 20px;
+            padding: 20px;
+            justify-content: space-around;
+            height: 100vh;
+        }
+
+        .photo-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 140px;
+            flex: 0 0 140px;
+            animation: scrollPhotosUp 22s linear infinite;
+        }
+
+        .photo-column:nth-child(even) {
+            animation: scrollPhotosDown 120s linear infinite;
+        }
+
+        .photo-placeholder {
+            width: 100%;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #ffb3d9 0%, #ff69b4 100%);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        @keyframes scrollPhotosUp {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(calc(-50% - 18px)); }
+        }
+
+        @keyframes scrollPhotosDown {
+            0% { transform: translateY(-2000px); }
+            100% { transform: translateY(calc(50% + 18px)); }
+        }
+
+        /* Photo tape foreground: layout of photos in rows/columns */
+        .photo-tape-display {
+            display: none;
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 218, 233, 0.95);
+            padding: 32px;
+            border-radius: 12px;
+            max-width: 580px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .photo-tape-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .tape-photo {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #ffb3d9 0%, #ff69b4 100%);
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
         .reset-btn {
-            background: none;
-            border: none;
-            color: #666;
-            font-size: 0.9em;
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #c41e3a;
+            color: #c41e3a;
+            font-size: 28px;
             cursor: pointer;
-            text-decoration: underline;
-            padding: 8px 12px;
-            margin-top: 8px;
+            padding: 12px 16px;
+            margin: 20px auto 0;
             font-family: inherit;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
         }
 
         .reset-btn:hover {
-            color: #111;
+            background: #c41e3a;
+            color: white;
+            transform: rotate(180deg);
         }
+
+        /* Wordsearch styles */
+        .wordsearch-container {
+            width: 56vh;
+            max-width: 100%;
+            margin: 12px auto 0;
+            background: #fff7fb;
+            padding: 14px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 6px;
+            width: 100%;
+            max-width: 540px;
+            margin: 0 auto 12px;
+        }
+
+        .word-cell {
+            background: linear-gradient(180deg, #fff 0%, #f6f0f6 100%);
+            border-radius: 6px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #333;
+            user-select: none;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+
+        .word-cell.selected {
+            background: linear-gradient(180deg, #ffdbe6 0%, #ffc1dd 100%);
+            color: #7a0030;
+        }
+
+        .word-cell.found {
+            background: linear-gradient(180deg, #dff7e6 0%, #bff0ce 100%);
+            color: #05683b;
+            cursor: default;
+        }
+
+        .word-cell.shared {
+            box-shadow: inset 0 -6px 0 rgba(0,0,0,0.04);
+            background: linear-gradient(180deg, #d8f6e9 0%, #a8e8c8 100%);
+            color: #0a5a33;
+        }
+
+        .word-list {
+            display: grid;
+            grid-template-columns: repeat(5, auto);
+            gap: 12px;
+            justify-content: center;
+            align-content: center;
+            max-width: fit-content;
+            margin: 0 auto 8px;
+            list-style: none;
+            padding: 0;
+        }
+
+        .word-list li {
+            padding: 6px 10px;
+            border-radius: 18px;
+            background: #fff;
+            font-weight: 600;
+            color: #333;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .word-list li.found {
+            text-decoration: line-through;
+            opacity: 0.45;
+        }
+
+        .word-controls { text-align: center; margin-top: 8px; }
+        .word-clear-btn { margin-left: 8px; padding: 6px 12px; border-radius: 8px; border: none; background: #ffdbe6; cursor: pointer; }
 
     </style>
 </head>
@@ -625,7 +832,7 @@
         <div class="modal-inner">
             <!-- VIEW: Puzzle (playing + completed state in same view) -->
             <div id="puzzleView" class="modal-view">
-                <h1 class="modal-title">Dear Gaby...</h1>
+                <h1 class="modal-title">Dear Elyssa...</h1>
                 <div class="puzzle-container" id="puzzleContainer">
                     <div class="puzzle-grid-wrap" id="puzzleGridWrap">
                         <div class="puzzle-grid" id="puzzleGrid"></div>
@@ -636,18 +843,320 @@
                 </div>
                 <div class="puzzle-reveal-text" id="puzzleRevealText">
                     <p class="complete-line">...you complete me.</p>
-                    <p class="valentine-question">Will you be my Valentine?</p>
+                </div>
+                <button id="skipPuzzleBtn" style="margin-top: 12px; padding: 8px 16px; font-size: 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; color: #666;">Skip (testing)</button>
+            </div>
+            <!-- WORDSEARCH VIEW: shown after first puzzle -->
+            <div id="wordsearchView" class="modal-view">
+                <h2 class="modal-title">A second puzzle — wordsearch</h2>
+                <p style="margin-bottom:8px;">Find these words:</p>
+                <ul class="word-list" id="wordList">
+                    <li data-word="LOVELY">Lovely</li>
+                    <li data-word="BEAUTIFUL">Beautiful</li>
+                    <li data-word="GORGEOUS">Gorgeous</li>
+                    <li data-word="AMAZING">Amazing</li>
+                    <li data-word="VALENTINE">Valentine</li>
+                    <li data-word="PRETTY">Pretty</li>
+                    <li data-word="SWEET">Sweet</li>
+                    <li data-word="CUTE">Cute</li>
+                    <li data-word="MINE">Mine</li>
+                </ul>
+
+                <div class="wordsearch-container">
+                    <div class="word-grid" id="wordGrid" aria-hidden="false"></div>
+                    <div class="word-controls">
+                        <span id="currentSelection">Selected: </span>
+                        <button id="clearSelectionBtn" class="word-clear-btn">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUESTION VIEW: appears after completing the wordsearch; hides the wordsearch when shown -->
+            <div id="questionView" class="modal-view">
+                <p class="modal-title">Will you be my Valentine my love?</p>
+                <div style="margin-top:8px;">
                     <button type="button" class="yes-only-btn" id="yesBtn">Yes</button>
                 </div>
+            </div>
             </div>
 
             <!-- VIEW: Success -->
             <div id="successView" class="modal-view">
-                <p class="modal-title">Yay, I can't wait!</p>
-                <div class="success-gif-wrap">
-                    <img src="giphy.gif" alt="" />
+                <div class="photo-tape-bg">
+                    <div class="photo-tape-columns">
+                        <div class="photo-column">
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                        </div>
+                        <div class="photo-column">
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                        </div>
+                        <div class="photo-column">
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                        </div>
+                        <div class="photo-column">
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                        </div>
+                        <div class="photo-column">
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                        </div>
+                        <div class="photo-column">
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                            <div class="photo-placeholder"></div>
+                        </div>
+                    </div>
                 </div>
-                <button type="button" class="reset-btn" id="resetBtn">Reset</button>
+                <p class="modal-title" style="position: relative; z-index: 2;">Yay, I can't wait to see you baby <3</p>
+                <div class="photo-tape-display">
+                    <div class="photo-tape-grid">
+                        <div class="tape-photo"></div>
+                        <div class="tape-photo"></div>
+                        <div class="tape-photo"></div>
+                        <div class="tape-photo"></div>
+                        <div class="tape-photo"></div>
+                        <div class="tape-photo"></div>
+                        <div class="tape-photo"></div>
+                        <div class="tape-photo"></div>
+                        <div class="tape-photo"></div>
+                    </div>
+                </div>
+                <button type="button" class="reset-btn" id="resetBtn" style="position: relative; z-index: 2;">↻</button>
             </div>
         </div>
     </div>
@@ -659,6 +1168,8 @@
         const puzzleGrid = document.getElementById('puzzleGrid');
         const puzzleView = document.getElementById('puzzleView');
         const successView = document.getElementById('successView');
+        const questionView = document.getElementById('questionView');
+        const container = document.querySelector('.container');
         
         envelope.addEventListener('click', () => {
             envelope.style.pointerEvents = 'none';
@@ -692,8 +1203,8 @@
         }
         
         function scramblePuzzle() {
-            // TESTING NOTE: Use "i < 1" instead of "i < 10" so that the puzzle is one move away from completion
-            for (let i = 0; i < 10; i++) {
+            // Perform 25 random moves to ensure puzzle is hard (typically requires 7+ moves to solve)
+            for (let i = 0; i < 25; i++) {
                 const emptyIndex = currentState.indexOf(EMPTY_PIECE);
                 const validMoves = getValidMoves(emptyIndex);
                 const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
@@ -767,7 +1278,15 @@
                 puzzleFullImageOverlay.classList.add('show');
                 setTimeout(() => {
                     puzzleGridWrap.classList.add('revealing');
-                    puzzleRevealText.classList.add('show');
+                    // Immediately proceed to the wordsearch view (second puzzle)
+                    puzzleView.classList.remove('visible');
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            const wordsearchView = document.getElementById('wordsearchView');
+                            wordsearchView.classList.add('visible');
+                            initWordsearch();
+                        });
+                    });
                 }, 250);
             }, 280);
         }
@@ -788,25 +1307,512 @@
         
         initPuzzle();
         
-        const container = document.querySelector('.container');
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            window.location.reload();
+        });
+
+        // Photo loading from memories folder
+        async function loadPhotosFromManifest() {
+            try {
+                const response = await fetch('images/memories/manifest.json');
+                const data = await response.json();
+                return data.photos || [];
+            } catch (error) {
+                console.warn('Could not load photos manifest:', error);
+                return [];
+            }
+        }
+
+        function getRandomPhoto(photos) {
+            if (photos.length === 0) return null;
+            return photos[Math.floor(Math.random() * photos.length)];
+        }
+
+        async function populatePhotoTape() {
+            const photos = await loadPhotosFromManifest();
+            if (photos.length === 0) return; // Use placeholders if no photos
+
+            // Populate background tape columns
+            const bgPlaceholders = document.querySelectorAll('.photo-tape-bg .photo-placeholder');
+            bgPlaceholders.forEach(placeholder => {
+                const photo = getRandomPhoto(photos);
+                if (photo) {
+                    placeholder.style.backgroundImage = `url('images/memories/${photo}')`;
+                    placeholder.style.backgroundSize = 'cover';
+                    placeholder.style.backgroundPosition = 'center';
+                }
+            });
+
+            // Populate foreground tape grid
+            const fgPhotos = document.querySelectorAll('.tape-photo');
+            fgPhotos.forEach(photo => {
+                const img = getRandomPhoto(photos);
+                if (img) {
+                    photo.style.backgroundImage = `url('images/memories/${img}')`;
+                    photo.style.backgroundSize = 'cover';
+                    photo.style.backgroundPosition = 'center';
+                }
+            });
+        }
+
+        // Call this when success view appears
+        const originalSuccessViewHTML = successView.innerHTML;
+        const observer = new MutationObserver(() => {
+            if (successView.classList.contains('visible')) {
+                populatePhotoTape();
+                observer.disconnect();
+            }
+        });
+        observer.observe(successView, { attributes: true, attributeFilter: ['class'] });
+
+        // Fallback: also populate on init in case success view is shown via skip
+        populatePhotoTape();
+
+        // Attach yes button handler (works for both normal and skip flow)
         document.getElementById('yesBtn').addEventListener('click', () => {
-            runConfettiFor(10000);
+            runConfettiFor(10000, 2);
+            runConfettiFor(20000, 1);
+            runConfettiFor(80000000, 1);
             container.classList.add('container--success');
-            puzzleView.classList.remove('visible');
+            questionView.classList.remove('visible');
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => successView.classList.add('visible'));
             });
         });
-        
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            window.location.reload();
+
+        // Skip button for testing: jump straight to the valentine question
+        document.getElementById('skipPuzzleBtn').addEventListener('click', () => {
+            const puzzleView = document.getElementById('puzzleView');
+            puzzleView.classList.remove('visible');
+            questionView.classList.add('visible');
         });
+
+        // --- Wordsearch logic ---
+        let WORDS = ['LOVELY','BEAUTIFUL','GORGEOUS','AMAZING','VALENTINE','PRETTY','SWEET','CUTE','MINE'];
+        let gridRows = 12, gridCols = 12;
+        let grid = [];
+        let owners = [];// parallel 2D array: list of word indices owning each cell
+        let ownersUsedCount = [];// parallel 2D array: how many owning words have been found/used
+        let selected = [];
+        let foundWords = new Set();
+
+        function initWordsearch() {
+            // initialize empty grid, owners and ownersUsedCount
+            grid = Array.from({length: gridRows}, () => Array(gridCols).fill(''));
+            owners = Array.from({length: gridRows}, () => Array.from({length: gridCols}, () => []));
+            ownersUsedCount = Array.from({length: gridRows}, () => Array.from({length: gridCols}, () => 0));
+
+            // Force certain words to be diagonal (place these first)
+            const words = WORDS.slice();
+            const diagList = ['VALENTINE','PRETTY','SWEET','CUTE'];
+            const diagIndices = new Set();
+            words.forEach((w, i) => {
+                const up = w.toUpperCase();
+                if (diagList.includes(up)) diagIndices.add(i);
+            });
+
+            // place diagonal words first, then the rest
+            const order = [];
+            diagIndices.forEach(i => order.push(i));
+            for (let i = 0; i < words.length; i++) if (!diagIndices.has(i)) order.push(i);
+
+            for (const wi of order) {
+                const rawWord = words[wi];
+                const word = rawWord.toUpperCase();
+                let placed = false;
+                const tryReverse = Math.random() < 0.5;
+                const w = tryReverse ? word.split('').reverse().join('') : word;
+
+                for (let attempt = 0; attempt < 400 && !placed; attempt++) {
+                    // choose direction: across, down, or diagonal if required
+                    let dir;
+                    if (diagIndices.has(wi)) dir = 'diag';
+                    else dir = Math.random() < 0.5 ? 'across' : 'down';
+
+                    if (dir === 'across') {
+                        const row = Math.floor(Math.random() * gridRows);
+                        const maxCol = gridCols - w.length;
+                        if (maxCol < 0) continue;
+                        const col = Math.floor(Math.random() * (maxCol + 1));
+                        let ok = true;
+                        for (let i = 0; i < w.length; i++) {
+                            const existing = grid[row][col + i];
+                            if (existing !== '' && existing !== w[i]) { ok = false; break; }
+                        }
+                            if (ok) {
+                                for (let i = 0; i < w.length; i++) {
+                                    grid[row][col + i] = w[i];
+                                    owners[row][col + i].push(wi);
+                                }
+                                placed = true;
+                            }
+                    } else if (dir === 'down') {
+                        const col = Math.floor(Math.random() * gridCols);
+                        const maxRow = gridRows - w.length;
+                        if (maxRow < 0) continue;
+                        const row = Math.floor(Math.random() * (maxRow + 1));
+                        let ok = true;
+                        for (let i = 0; i < w.length; i++) {
+                            const existing = grid[row + i][col];
+                            if (existing !== '' && existing !== w[i]) { ok = false; break; }
+                        }
+                        if (ok) {
+                            for (let i = 0; i < w.length; i++) {
+                                grid[row + i][col] = w[i];
+                                owners[row + i][col].push(wi);
+                            }
+                            placed = true;
+                        }
+                    } else if (dir === 'diag') {
+                        const diagDirs = [ {dr:1,dc:1}, {dr:1,dc:-1}, {dr:-1,dc:1}, {dr:-1,dc:-1} ];
+                        const d = diagDirs[Math.floor(Math.random() * diagDirs.length)];
+                        let rowStartMin = d.dr === 1 ? 0 : w.length - 1;
+                        let rowStartMax = d.dr === 1 ? gridRows - w.length : gridRows - 1;
+                        let colStartMin = d.dc === 1 ? 0 : w.length - 1;
+                        let colStartMax = d.dc === 1 ? gridCols - w.length : gridCols - 1;
+                        if (rowStartMax < rowStartMin || colStartMax < colStartMin) continue;
+                        const row = Math.floor(Math.random() * (rowStartMax - rowStartMin + 1)) + rowStartMin;
+                        const col = Math.floor(Math.random() * (colStartMax - colStartMin + 1)) + colStartMin;
+                        let ok = true;
+                        for (let i = 0; i < w.length; i++) {
+                            const rr = row + i * d.dr;
+                            const cc = col + i * d.dc;
+                            const existing = grid[rr][cc];
+                            if (existing !== '' && existing !== w[i]) { ok = false; break; }
+                        }
+                        if (ok) {
+                            for (let i = 0; i < w.length; i++) {
+                                const rr = row + i * d.dr;
+                                const cc = col + i * d.dc;
+                                grid[rr][cc] = w[i];
+                                owners[rr][cc].push(wi);
+                            }
+                            placed = true;
+                        }
+                    }
+                }
+
+                if (!placed) {
+                    // If this word was required to be diagonal, try systematic diagonal placements before falling back to across
+                    if (diagIndices && diagIndices.has(wi)) {
+                        const diagDirs = [ {dr:1,dc:1}, {dr:1,dc:-1}, {dr:-1,dc:1}, {dr:-1,dc:-1} ];
+                        outerDiag: for (const d of diagDirs) {
+                            for (let r = 0; r < gridRows; r++) {
+                                for (let c = 0; c < gridCols; c++) {
+                                    const rowStartMin = d.dr === 1 ? 0 : word.length - 1;
+                                    const rowStartMax = d.dr === 1 ? gridRows - word.length : gridRows - 1;
+                                    const colStartMin = d.dc === 1 ? 0 : word.length - 1;
+                                    const colStartMax = d.dc === 1 ? gridCols - word.length : gridCols - 1;
+                                    if (r < rowStartMin || r > rowStartMax || c < colStartMin || c > colStartMax) continue;
+                                    let ok = true;
+                                    for (let i = 0; i < word.length; i++) {
+                                        const rr = r + i * d.dr;
+                                        const cc = c + i * d.dc;
+                                        const existing = grid[rr][cc];
+                                        if (existing !== '' && existing !== (tryReverse ? w[i] : w[i])) { ok = false; break; }
+                                    }
+                                    if (ok) {
+                                        for (let i = 0; i < word.length; i++) {
+                                            const rr = r + i * d.dr;
+                                            const cc = c + i * d.dc;
+                                            grid[rr][cc] = w[i];
+                                            owners[rr][cc].push(wi);
+                                        }
+                                        placed = true;
+                                        break outerDiag;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // fallback: try across placement
+                    if (!placed) {
+                        outer: for (let r = 0; r < gridRows; r++) {
+                            for (let c = 0; c <= gridCols - word.length; c++) {
+                                let ok = true;
+                                for (let i = 0; i < word.length; i++) {
+                                    const existing = grid[r][c + i];
+                                    if (existing !== '' && existing !== word[i]) { ok = false; break; }
+                                }
+                                if (ok) {
+                                    for (let i = 0; i < word.length; i++) {
+                                        grid[r][c + i] = word[i];
+                                        owners[r][c + i].push(wi);
+                                    }
+                                    placed = true;
+                                    break outer;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // fill remaining empty cells with random letters
+            for (let r = 0; r < gridRows; r++) for (let c = 0; c < gridCols; c++) if (!grid[r][c]) grid[r][c] = randomLetter();
+
+            renderWordGrid();
+            renderWordList();
+            document.getElementById('clearSelectionBtn').onclick = clearSelection;
+            setupDragHandlers();
+        }
+
+        function randomLetter() { return String.fromCharCode(65 + Math.floor(Math.random()*26)); }
+
+        function placeWord(word, row, col, dir) {
+            word = word.toUpperCase();
+            if (dir === 'across') {
+                for (let i=0;i<word.length;i++) grid[row][col+i] = word[i];
+            } else if (dir === 'down') {
+                for (let i=0;i<word.length;i++) grid[row+i][col] = word[i];
+            }
+        }
+
+        function renderWordGrid() {
+            const wrap = document.getElementById('wordGrid');
+            wrap.innerHTML = '';
+            for (let r=0;r<gridRows;r++) {
+                for (let c=0;c<gridCols;c++) {
+                    const ch = grid[r][c];
+                    const cell = document.createElement('div');
+                    cell.className = 'word-cell';
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    cell.textContent = ch;
+                    // mark shared cells visually
+                    // shared cells are only shown after they've been used twice (ownersUsedCount>=2)
+                    // DOM will be updated when words are found.
+                    // small click fallback: select single cell
+                    cell.addEventListener('click', (e) => {
+                        if (isDragging) return; // ignore click that is part of drag
+                        clearSelection();
+                        addCellToSelection(cell, r, c);
+                        finalizeSelection();
+                    });
+                    wrap.appendChild(cell);
+                }
+            }
+            selected = [];
+            updateSelectionDisplay();
+        }
+
+        function renderWordList() {
+            const ul = document.getElementById('wordList');
+            Array.from(ul.querySelectorAll('li')).forEach(li => li.classList.remove('found'));
+            foundWords.clear();
+        }
+
+        function onCellClick(cell, r, c) {
+            // allow selecting a cell even if it's been marked found, provided
+            // it belongs to at least one word that is not yet found.
+            const cellOwners = (owners && owners[r] && owners[r][c]) ? owners[r][c] : [];
+            const allOwnersFound = cellOwners.length > 0 && cellOwners.every(idx => foundWords.has(WORDS[idx]));
+            if (allOwnersFound) return;
+
+            // toggle selection if last clicked is same
+            const key = r+','+c;
+            if (selected.length > 0 && selected.some(s => s.key === key)) return; // ignore duplicates
+
+            // enforce adjacency for subsequent selections
+            if (selected.length > 0) {
+                const last = selected[selected.length-1];
+                const dr = Math.abs(last.r - r), dc = Math.abs(last.c - c);
+                if (dr > 1 || dc > 1) return; // must be adjacent
+            }
+
+            selected.push({r,c,cell,key});
+            cell.classList.add('selected');
+            updateSelectionDisplay();
+            checkSelectionMatch();
+        }
+
+        function updateSelectionDisplay() {
+            const text = selected.map(s => s.cell.textContent).join('');
+            document.getElementById('currentSelection').textContent = 'Selected: ' + text;
+        }
+
+        function clearSelection() {
+            selected.forEach(s => s.cell.classList.remove('selected'));
+            selected = [];
+            updateSelectionDisplay();
+        }
+
+        // --- Drag-to-select support ---
+        let isDragging = false;
+        let dragStart = null; // {r,c}
+        let dragDir = null; // {dr,dc}
+
+        function addCellToSelection(cell, r, c) {
+            const key = r+','+c;
+            if (selected.some(s => s.key === key)) return;
+            // don't add if all owners of this cell are already found
+            const cellOwners = (owners && owners[r] && owners[r][c]) ? owners[r][c] : [];
+            const allOwnersFound = cellOwners.length > 0 && cellOwners.every(idx => foundWords.has(WORDS[idx]));
+            if (allOwnersFound) return;
+            selected.push({r,c,cell,key});
+            cell.classList.add('selected');
+            updateSelectionDisplay();
+        }
+
+        function trimSelectionTo(key) {
+            const idx = selected.findIndex(s => s.key === key);
+            if (idx === -1) return;
+            // remove extras
+            for (let i = selected.length - 1; i > idx; i--) {
+                selected[i].cell.classList.remove('selected');
+                selected.pop();
+            }
+            updateSelectionDisplay();
+        }
+
+        function finalizeSelection() {
+            checkSelectionMatch();
+        }
+
+        function cellFromPoint(x, y) {
+            const el = document.elementFromPoint(x, y);
+            if (!el) return null;
+            if (el.classList && el.classList.contains('word-cell')) return el;
+            return el.closest && el.closest('.word-cell');
+        }
+
+        function onPointerDown(e) {
+            if (e.button && e.button !== 0) return; // only left
+            const cell = cellFromPoint(e.clientX, e.clientY);
+            if (!cell) return;
+            isDragging = true;
+            dragStart = { r: Number(cell.dataset.r), c: Number(cell.dataset.c) };
+            dragDir = null;
+            clearSelection();
+            addCellToSelection(cell, dragStart.r, dragStart.c);
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        }
+
+        function onPointerMove(e) {
+            if (!isDragging) return;
+            const cell = cellFromPoint(e.clientX, e.clientY);
+            if (!cell) return;
+            const r = Number(cell.dataset.r), c = Number(cell.dataset.c);
+            const start = dragStart;
+            if (!start) return;
+            const dr = r - start.r, dc = c - start.c;
+            if (dr === 0 && dc === 0) {
+                // already at start
+                return;
+            }
+            // determine direction unit vector with components in {-1,0,1}
+            const stepR = dr === 0 ? 0 : (dr > 0 ? 1 : -1);
+            const stepC = dc === 0 ? 0 : (dc > 0 ? 1 : -1);
+            // check that target cell lies on straight line from start along (stepR,stepC)
+            // i.e., steps must be consistent: either horizontal, vertical, or diagonal
+            const steps = Math.max(Math.abs(dr), Math.abs(dc));
+            if ( (stepR !== 0 && stepC !== 0 && Math.abs(dr) !== Math.abs(dc)) ) {
+                // not a 45deg diagonal
+                return;
+            }
+            // set dragDir on first move
+            if (!dragDir) dragDir = { dr: stepR, dc: stepC };
+            // ensure current direction matches established direction
+            if (dragDir.dr !== stepR || dragDir.dc !== stepC) return;
+
+            // target key
+            const targetKey = start.r + ',' + start.c;
+            const targetR = start.r + steps * dragDir.dr;
+            const targetC = start.c + steps * dragDir.dc;
+            const targetKey2 = targetR + ',' + targetC;
+
+            // if cell already in selection and not last, trim
+            if (selected.some(s => s.key === targetKey2)) {
+                trimSelectionTo(targetKey2);
+                return;
+            }
+
+            // otherwise add missing intermediate cells along the line
+            let curLen = selected.length;
+            for (let k = curLen; k <= steps; k++) {
+                const rr = start.r + k * dragDir.dr;
+                const cc = start.c + k * dragDir.dc;
+                const el = document.querySelector('.word-cell[data-r="' + rr + '"][data-c="' + cc + '"]');
+                if (!el) break;
+                addCellToSelection(el, rr, cc);
+            }
+        }
+
+        function onPointerUp(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            dragStart = null;
+            dragDir = null;
+            document.body.style.userSelect = '';
+            finalizeSelection();
+        }
+
+        function setupDragHandlers() {
+            const gridEl = document.getElementById('wordGrid');
+            gridEl.addEventListener('pointerdown', onPointerDown);
+            gridEl.addEventListener('pointermove', onPointerMove);
+            document.addEventListener('pointerup', onPointerUp);
+            // prevent default touch behaviors
+            gridEl.style.touchAction = 'none';
+        }
+
+        function checkSelectionMatch() {
+            const word = selected.map(s => s.cell.textContent).join('');
+            const rev = word.split('').reverse().join('');
+            for (const target of WORDS) {
+                if (foundWords.has(target)) continue;
+                if (word === target || rev === target) {
+                    // mark found
+                    // mark all selected cells as found for this word
+                    selected.forEach(s => {
+                        s.cell.classList.remove('selected');
+                        s.cell.classList.add('found');
+                    });
+
+                    // update ownersUsedCount for every cell that this word owns
+                    const wordIndex = WORDS.indexOf(target);
+                    if (wordIndex !== -1) {
+                        for (let rr = 0; rr < gridRows; rr++) {
+                            for (let cc = 0; cc < gridCols; cc++) {
+                                if (owners[rr][cc] && owners[rr][cc].includes(wordIndex)) {
+                                    ownersUsedCount[rr][cc] = (ownersUsedCount[rr][cc] || 0) + 1;
+                                    // when a cell's ownersUsedCount reaches 2, mark it visually as shared
+                                    if (ownersUsedCount[rr][cc] >= 2) {
+                                        const el = document.querySelector('.word-cell[data-r="' + rr + '"][data-c="' + cc + '"]');
+                                        if (el) el.classList.add('shared');
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    const li = Array.from(document.getElementById('wordList').children).find(x => x.dataset.word === target);
+                    if (li) li.classList.add('found');
+                    foundWords.add(target);
+                    selected = [];
+                    updateSelectionDisplay();
+                    if (foundWords.size === WORDS.length) completeWordsearch();
+                    return;
+                }
+            }
+        }
+
+        function completeWordsearch() {
+            // hide the wordsearch and show the question view
+            const wordsearchView = document.getElementById('wordsearchView');
+            if (wordsearchView) wordsearchView.classList.remove('visible');
+            if (questionView) questionView.classList.add('visible');
+        }
         
-        function runConfettiFor(ms) {
+        function runConfettiFor(ms, intensity) {
             const end = Date.now() + ms;
             function tick() {
                 if (Date.now() < end) {
-                    createConfetti();
+                    for (let i = 0; i < intensity; i++) {
+                        createConfetti();
+                    }
                     setTimeout(tick, 80);
                 }
             }
@@ -816,10 +1822,10 @@
         function createConfetti() {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
+            confetti.textContent = '💋';
             confetti.style.left = Math.random() * 100 + '%';
-            confetti.style.top = '-10px';
-            confetti.style.background = ['#f093fb', '#f5576c', '#ffd700', '#4facfe', '#FFDAE9'][Math.floor(Math.random() * 5)];
-            const duration = 2 + Math.random() * 2;
+            confetti.style.top = '-40px';
+            const duration = 3 + Math.random() * 3;
             confetti.style.animation = `confetti-fall ${duration}s linear`;
             document.body.appendChild(confetti);
             setTimeout(() => confetti.remove(), (duration + 0.5) * 1000);
