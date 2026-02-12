@@ -5,7 +5,7 @@
  */
 
 // Minimal universe for wordsearch logic
-let WORDS = ['LOVELY','BEAUTIFUL','GORGEOUS','AMAZING','VALENTINE','PRETTY','SWEET','CUTE','MINE'];
+let WORDS = ['LOVELY','BEAUTIFUL','GORGEOUS','AMAZING','VALENTINE','PRETTY','SWEET','CUTE','MINE','KIND'];
 let gridRows = 12, gridCols = 12;
 let grid = [];
 let owners = [];
@@ -19,7 +19,7 @@ function initWordsearch() {
     ownersUsedCount = Array.from({length: gridRows}, () => Array.from({length: gridCols}, () => 0));
 
     const words = WORDS.slice();
-    const diagList = ['VALENTINE','PRETTY','SWEET','CUTE'];
+    const diagList = ['VALENTINE','PRETTY','SWEET','CUTE','KIND'];
     const diagIndices = new Set();
     words.forEach((w, i) => {
         const up = w.toUpperCase();
@@ -211,8 +211,8 @@ function checkWordInGrid(word) {
 }
 
 // Run tests
-const numTrials = 20;
-const diagonalWords = ['VALENTINE', 'PRETTY', 'SWEET', 'CUTE'];
+const numTrials = 100;
+const diagonalWords = ['VALENTINE', 'PRETTY', 'SWEET', 'CUTE','KIND'];
 const results = {
     totalTrials: 0,
     allWordsFound: 0,
@@ -221,13 +221,14 @@ const results = {
         'VALENTINE': 0,
         'PRETTY': 0,
         'SWEET': 0,
-        'CUTE': 0
+        'CUTE': 0,
+        'KIND': 0
     },
     missingDiagonalRuns: []
 };
 
 for (let trial = 0; trial < numTrials; trial++) {
-    WORDS = ['LOVELY','BEAUTIFUL','GORGEOUS','AMAZING','VALENTINE','PRETTY','SWEET','CUTE','MINE'];
+    WORDS = ['LOVELY','BEAUTIFUL','GORGEOUS','AMAZING','VALENTINE','PRETTY','SWEET','CUTE','MINE','KIND'];
     initWordsearch();
     
     results.totalTrials++;
@@ -255,7 +256,7 @@ for (let trial = 0; trial < numTrials; trial++) {
 
 console.log(`\n===== Wordsearch Generation Check (${numTrials} trials) =====\n`);
 console.log(`All words found in every trial: ${results.allWordsFound}/${results.totalTrials}`);
-console.log(`All 4 diagonals placed in every trial: ${results.allDiagonalsPlaced}/${results.totalTrials}`);
+console.log(`All 5 diagonals placed in every trial: ${results.allDiagonalsPlaced}/${results.totalTrials}`);
 console.log(`\nDiagonal placement rates:`);
 for (const [word, count] of Object.entries(results.diagonalCounts)) {
     console.log(`  ${word}: ${count}/${numTrials} (${(count/numTrials*100).toFixed(1)}%)`);
@@ -264,7 +265,7 @@ for (const [word, count] of Object.entries(results.diagonalCounts)) {
 if (results.missingDiagonalRuns.length > 0) {
     console.log(`\n⚠️  Missing diagonals in trials: ${results.missingDiagonalRuns.join(', ')}`);
 } else {
-    console.log(`\n✓ All 4 diagonals placed successfully in every trial!`);
+    console.log(`\n✓ All 5 diagonals placed successfully in every trial!`);
 }
 
-console.log(`\n✓ All 9 words present in every trial: ${results.allWordsFound === results.totalTrials ? 'YES' : 'NO'}`);
+console.log(`\n✓ All 10 words present in every trial: ${results.allWordsFound === results.totalTrials ? 'YES' : 'NO'}`);

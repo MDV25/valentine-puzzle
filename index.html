@@ -48,39 +48,72 @@
             padding: 40px 36px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            width: fit-content;
-            max-width: min(650px, calc(100vw - 48px));
+            /* Don't use fit-content here: views are layered for page-turn, so the card must have a real width */
+            width: min(650px, calc(100vw - 48px));
+            max-width: 100%;
             min-width: 0;
-            min-height: 520px;
+            min-height: 700px;
             max-height: calc(100vh - 48px);
-            overflow-y: auto;
+            /* Views are absolutely positioned for the page-turn; scrolling must happen inside the active view */
+            overflow: hidden;
             position: relative;
             transform-origin: center center;
             transition: opacity 0.25s ease, transform 0.3s ease;
+            perspective: 1200px; /* enables 3D */
         }
 
         .modal-inner {
             flex: 1 1 auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 0;
-            width: fit-content;
+            position: relative;
+            width: 100%;
             max-width: 100%;
+            min-height: 0;
         }
 
         .modal-view {
-            width: fit-content;
+            position: absolute;
+            inset: 0;
+            width: 100%;
             max-width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            overflow-y: auto;
             opacity: 0;
-            transition: opacity 0.25s ease;
-            display: none;
+            transform: rotateY(0deg);
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            transition: transform 0.75s cubic-bezier(.2,.9,.2,1), opacity 0.25s ease;
+            pointer-events: none;
         }
 
         .modal-view.visible {
-            display: block;
             opacity: 1;
+            pointer-events: auto;
+            z-index: 2;
+        }
+
+        .modal-view.turn-out {
+            transform: rotateY(-180deg);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .modal-view.turn-in {
+            transform: rotateY(180deg);
+            opacity: 0;
+            pointer-events: auto;
+            z-index: 3;
+            animation: turnIn 0.75s cubic-bezier(.2,.9,.2,1) forwards;
+        }
+
+        @keyframes turnIn {
+            from { transform: rotateY(180deg); opacity: 0 }
+            to   { transform: rotateY(0deg); opacity: 1 }
         }
 
         .envelope {
@@ -204,10 +237,10 @@
             padding: 40px 20px;
             line-height: 1.1;
             text-shadow: 
-                0 0 20px rgba(196, 30, 58, 0.8),
-                0 0 40px rgba(196, 30, 58, 0.6),
-                2px 2px 8px rgba(196, 30, 58, 0.7),
-                4px 4px 12px rgba(196, 30, 58, 0.5);
+                0 0 20px rgba(137, 27, 45, 0.8),
+                0 0 40px rgba(143, 27, 46, 0.6),
+                2px 2px 8px rgba(130, 28, 45, 0.7),
+                4px 4px 12px rgba(110, 24, 38, 0.5);
             text-align: center;
             position: relative;
             z-index: 2;
@@ -463,6 +496,48 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
+        .question-buttons {
+            margin-top: 8px;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            width: 380px;
+            height: 110px;
+        }
+
+        .no-run-btn {
+            font-size: 18px;
+            padding: 10px 22px;
+            background: #ffffff;
+            color: #c41e3a;
+            border: 1px solid rgba(196, 30, 58, 0.5);
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            position: absolute;
+            transition: left 0.18s ease, top 0.18s ease, transform 0.18s ease;
+        }
+
+        .question-emoji {
+            margin-top: 90px;
+            font-size: clamp(250px, 24vmin + 40px, 320px);
+            line-height: 1;
+            opacity: 0;
+            transform: translateY(12px) scale(0.9);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            flex: 1 1 auto; /* let it fill most of the remaining white card */
+        }
+
+        .question-emoji.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
         @media (max-width: 600px) {
             body {
                 padding: 16px;
@@ -561,8 +636,6 @@
                 padding: 14px;
             }
             .container {
-                transform: scale(0.95);
-                transform-origin: center center;
                 padding: 22px 36px;
             }
         }
@@ -571,39 +644,32 @@
                 padding: 12px;
             }
             .container {
-                transform: scale(0.85);
-                transform-origin: center center;
                 padding: 20px 36px;
             }
         }
         @media (max-height: 600px) {
             .container {
-                transform: scale(0.72);
                 padding: 16px 36px;
             }
         }
         @media (max-height: 500px) {
             .container {
-                transform: scale(0.6);
                 padding: 12px 36px;
             }
         }
         @media (max-height: 420px) {
             .container {
-                transform: scale(0.5);
                 padding: 10px 36px;
             }
         }
         /* Short and narrow: apply stronger scale so content fits */
         @media (max-height: 600px) and (max-width: 480px) {
             .container {
-                transform: scale(0.65);
                 padding: 12px 36px;
             }
         }
         @media (max-height: 500px) and (max-width: 420px) {
             .container {
-                transform: scale(0.55);
                 padding: 10px 36px;
             }
         }
@@ -614,6 +680,11 @@
             box-shadow: none;
             padding: 24px;
             position: relative;
+            /* Let the final screen fill the viewport width & height */
+            width: 100%;
+            max-width: none;
+            min-height: calc(100vh - 48px);
+            max-height: none;
         }
 
         .container.container--success::before {
@@ -652,29 +723,51 @@
             inset: 0;
             background: #FFDAE9;
             overflow: hidden;
-            z-index: -1;
+            z-index: -3; /* sit fully behind all success content */
+        }
+
+        /* Fade the photo columns out at the very top and bottom edges */
+        .photo-tape-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            /* Same pink as the background so images fade into it */
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 218, 233, 1) 0%,
+                rgba(255, 218, 233, 0) 18%,
+                rgba(255, 218, 233, 0) 82%,
+                rgba(255, 218, 233, 1) 100%
+            );
+            z-index: 1;
         }
 
         .photo-tape-columns {
             display: flex;
             width: 100%;
-            gap: 20px;
-            padding: 20px;
-            justify-content: space-around;
+            gap: 16px;
+            padding: 12px 10px;
+            justify-content: space-between;
             height: 100vh;
         }
 
         .photo-column {
+            min-width: 140px;
+            flex: 1 1 160px; /* allow columns to grow so the strip is almost as wide as the page */
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .photo-column-track {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            min-width: 140px;
-            flex: 0 0 140px;
-            animation: scrollPhotosUp 22s linear infinite;
+            animation: scrollPhotosUp 200s linear infinite;
         }
 
-        .photo-column:nth-child(even) {
-            animation: scrollPhotosDown 120s linear infinite;
+        .photo-column:nth-child(even) .photo-column-track {
+            animation: scrollPhotosDown 200s linear infinite;
         }
 
         .photo-placeholder {
@@ -683,16 +776,23 @@
             background: linear-gradient(135deg, #ffb3d9 0%, #ff69b4 100%);
             border-radius: 4px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            opacity: 0.4;
+        }
+
+        /* Ensure any real images placed into the tape also follow the same opacity */
+        .photo-column img,
+        .photo-tape-grid .tape-photo {
+            opacity: 0.8;
         }
 
         @keyframes scrollPhotosUp {
             0% { transform: translateY(0); }
-            100% { transform: translateY(calc(-50% - 18px)); }
+            100% { transform: translateY(-50%); }
         }
 
         @keyframes scrollPhotosDown {
-            0% { transform: translateY(-2000px); }
-            100% { transform: translateY(calc(50% + 18px)); }
+            0% { transform: translateY(-50%); }
+            100% { transform: translateY(0); }
         }
 
         /* Photo tape foreground: layout of photos in rows/columns */
@@ -748,9 +848,13 @@
 
         /* Wordsearch styles */
         .wordsearch-container {
-            width: 56vh;
+            width: min(72vmin, 560px);
             max-width: 100%;
             margin: 12px auto 0;
+            height: min(72vmin, 600px);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
             background: #fff7fb;
             padding: 14px;
             border-radius: 12px;
@@ -762,7 +866,8 @@
             grid-template-columns: repeat(12, 1fr);
             gap: 6px;
             width: 100%;
-            max-width: 540px;
+            height: 100%;
+            grid-auto-rows: 1fr; /* make rows share available height so whole grid fits */
             margin: 0 auto 12px;
         }
 
@@ -793,8 +898,8 @@
 
         .word-cell.shared {
             box-shadow: inset 0 -6px 0 rgba(0,0,0,0.04);
-            background: linear-gradient(180deg, #a8cdbd 0%, #386b52 100%);
-            color: #0a5a33;
+            background: linear-gradient(180deg, #a8cdbd 0%, #54a47d 100%);
+            color: #32a56d;
         }
 
         .word-list {
@@ -825,6 +930,44 @@
 
         .word-controls { text-align: center; margin-top: 8px; }
         .word-clear-btn { margin-left: 8px; padding: 6px 12px; border-radius: 8px; border: none; background: #ffdbe6; cursor: pointer; }
+
+        /* Wordsearch view: keep all content on a single screen without view-level scrolling */
+        #wordsearchView {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+        }
+
+        /* Ensure the wordsearch container fills the available space and the grid cells scale to fit */
+        .wordsearch-container {
+            width: min(72vmin, 560px);
+            max-width: 100%;
+            margin: 6px auto 0;
+            height: min(72vmin, 560px);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            background: #fff7fb;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        }
+
+        .word-grid {
+            width: 100%;
+            height: 100%;
+            grid-auto-rows: 1fr;
+            margin: 0 auto;
+        }
+
+        .word-cell {
+            height: auto;
+            font-size: clamp(10px, 1.6vmin + 6px, 18px);
+        }
 
     </style>
 </head>
@@ -864,7 +1007,6 @@
             </div>
             <!-- WORDSEARCH VIEW: shown after first puzzle -->
             <div id="wordsearchView" class="modal-view">
-                <h2 class="modal-title">A second puzzle — wordsearch</h2>
                 <p style="margin-bottom:8px;">Find these words:</p>
                 <ul class="word-list" id="wordList">
                     <li data-word="LOVELY">Lovely</li>
@@ -876,6 +1018,7 @@
                     <li data-word="SWEET">Sweet</li>
                     <li data-word="CUTE">Cute</li>
                     <li data-word="MINE">Mine</li>
+                    <li data-word="KIND">Kind</li>
                 </ul>
 
                 <div class="wordsearch-container">
@@ -890,9 +1033,11 @@
             <!-- QUESTION VIEW: appears after completing the wordsearch; hides the wordsearch when shown -->
             <div id="questionView" class="modal-view">
                 <p class="modal-title">Will you be my Valentine my love?</p>
-                <div style="margin-top:8px;">
+                <div class="question-buttons">
                     <button type="button" class="yes-only-btn" id="yesBtn">Yes</button>
+                    <button type="button" class="no-run-btn" id="noBtn">No</button>
                 </div>
+                <div class="question-emoji" id="pleadEmoji" aria-hidden="true">🙏🏻</div>
             </div>
             </div>
 
@@ -1158,7 +1303,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="modal-title" style="position: relative; z-index: 2;">Yay, I can't wait to see you baby <3</p>
+                <p class="modal-title" style="position: relative; z-index: 2;">Yay, I can't wait to <br>see you baby <3</p>
                 <div class="photo-tape-display">
                     <div class="photo-tape-grid">
                         <div class="tape-photo"></div>
@@ -1187,6 +1332,36 @@
         const questionView = document.getElementById('questionView');
         const container = document.querySelector('.container');
         
+        /**
+         * Switch from one modal view to another with a page-turn animation.
+         * If `fromEl` is null, the `toEl` will simply animate in.
+         * `forward` controls the turn direction (true -> left-origin forward turn).
+         */
+        function switchView(fromEl, toEl, forward = true) {
+            if (!toEl) return;
+            const duration = 750; // ms, should match CSS
+
+            const origin = forward ? 'left center' : 'right center';
+            if (fromEl) {
+                fromEl.style.transformOrigin = origin;
+                fromEl.classList.add('turn-out');
+            }
+
+            toEl.style.transformOrigin = origin;
+            toEl.classList.add('turn-in');
+            toEl.classList.add('visible');
+
+            // cleanup after animation completes
+            setTimeout(() => {
+                if (fromEl) {
+                    fromEl.classList.remove('visible', 'turn-out');
+                    fromEl.style.transformOrigin = '';
+                }
+                toEl.classList.remove('turn-in');
+                toEl.style.transformOrigin = '';
+            }, duration + 30);
+        }
+        
         envelope.addEventListener('click', () => {
             envelope.style.pointerEvents = 'none';
             const heart = envelope.querySelector('.envelope-heart');
@@ -1199,7 +1374,7 @@
                         envelopeStage.style.display = 'none';
                         document.body.classList.add('show-modal');
                         requestAnimationFrame(() => {
-                            requestAnimationFrame(() => puzzleView.classList.add('visible'));
+                            requestAnimationFrame(() => switchView(null, puzzleView, true));
                         });
                     }, 450);
                 }, 700);
@@ -1220,7 +1395,7 @@
         
         function scramblePuzzle() {
             // Perform 25 random moves to ensure puzzle is hard (typically requires 7+ moves to solve)
-            for (let i = 0; i < 25; i++) {
+            for (let i = 0; i < 40; i++) {
                 const emptyIndex = currentState.indexOf(EMPTY_PIECE);
                 const validMoves = getValidMoves(emptyIndex);
                 const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
@@ -1296,11 +1471,10 @@
                 setTimeout(() => {
                     puzzleGridWrap.classList.add('revealing');
                     // Pause to admire the photo longer before proceeding to the wordsearch view
-                    puzzleView.classList.remove('visible');
                     requestAnimationFrame(() => {
                         requestAnimationFrame(() => {
                             const wordsearchView = document.getElementById('wordsearchView');
-                            wordsearchView.classList.add('visible');
+                            switchView(puzzleView, wordsearchView, true);
                             initWordsearch();
                         });
                     });
@@ -1345,20 +1519,77 @@
             return photos[Math.floor(Math.random() * photos.length)];
         }
 
+        function getRandomPhotoExcluding(photos, exclude) {
+            if (photos.length === 0) return null;
+            if (photos.length === 1) return photos[0];
+
+            let candidate = exclude;
+            while (candidate === exclude) {
+                candidate = getRandomPhoto(photos);
+            }
+            return candidate;
+        }
+
+        function initPhotoTapeColumns() {
+            const columns = document.querySelectorAll('.photo-tape-bg .photo-column');
+            columns.forEach(column => {
+                let track = column.querySelector('.photo-column-track');
+                if (track) return;
+
+                track = document.createElement('div');
+                track.className = 'photo-column-track';
+                const originals = Array.from(column.children);
+                originals.forEach(child => {
+                    child.dataset.photoOriginal = 'true';
+                    track.appendChild(child);
+                });
+                column.appendChild(track);
+            });
+        }
+
+        function rebuildPhotoTapeClones() {
+            const columns = document.querySelectorAll('.photo-tape-bg .photo-column');
+            columns.forEach(column => {
+                const track = column.querySelector('.photo-column-track');
+                if (!track) return;
+
+                track.querySelectorAll('[data-photo-clone="true"]').forEach(clone => clone.remove());
+                const originals = Array.from(track.querySelectorAll('[data-photo-original="true"]'));
+                originals.forEach(original => {
+                    const clone = original.cloneNode(true);
+                    clone.dataset.photoClone = 'true';
+                    clone.removeAttribute('data-photo-original');
+                    track.appendChild(clone);
+                });
+            });
+        }
+
         async function populatePhotoTape() {
             const photos = await loadPhotosFromManifest();
+
+            initPhotoTapeColumns();
+            rebuildPhotoTapeClones();
+
             if (photos.length === 0) return; // Use placeholders if no photos
 
-            // Populate background tape columns
-            const bgPlaceholders = document.querySelectorAll('.photo-tape-bg .photo-placeholder');
-            bgPlaceholders.forEach(placeholder => {
-                const photo = getRandomPhoto(photos);
-                if (photo) {
-                    placeholder.style.backgroundImage = `url('images/memories/${photo}')`;
-                    placeholder.style.backgroundSize = 'cover';
-                    placeholder.style.backgroundPosition = 'center';
-                }
+            // Populate background tape columns (no duplicates in a row)
+            const columns = document.querySelectorAll('.photo-tape-bg .photo-column');
+            columns.forEach(column => {
+                const originals = column.querySelectorAll('.photo-column-track [data-photo-original="true"]');
+                let lastPhoto = null;
+
+                originals.forEach(placeholder => {
+                    const photo = getRandomPhotoExcluding(photos, lastPhoto);
+                    if (photo) {
+                        placeholder.style.backgroundImage = `url('images/memories/${photo}')`;
+                        placeholder.style.backgroundSize = 'cover';
+                        placeholder.style.backgroundPosition = 'center';
+                        lastPhoto = photo;
+                    }
+                });
             });
+
+            rebuildPhotoTapeClones();
 
             // Populate foreground tape grid
             const fgPhotos = document.querySelectorAll('.tape-photo');
@@ -1387,25 +1618,98 @@
 
         // Attach yes button handler (works for both normal and skip flow)
         document.getElementById('yesBtn').addEventListener('click', () => {
-            runConfettiFor(10000, 2);
-            runConfettiFor(20000, 1);
-            runConfettiFor(80000000, 1);
+            runConfettiFor(20000, 4);
             container.classList.add('container--success');
-            questionView.classList.remove('visible');
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => successView.classList.add('visible'));
-            });
+            switchView(questionView, successView, true);
         });
+
+        // Make the "No" button run away when the cursor gets close
+        (function setupNoButtonRunAway() {
+            const noBtn = document.getElementById('noBtn');
+            const yesBtn = document.getElementById('yesBtn');
+            const area = document.querySelector('#questionView .question-buttons');
+            const emoji = document.getElementById('pleadEmoji');
+            if (!noBtn || !area) return;
+
+            const THRESHOLD = 140; // desired minimum distance (px) from cursor to button center
+            let emojiLockedOn = false; // once true, emoji stays visible
+            let yesScale = 0.95; // Yes button starts just under normal size
+
+            function moveNoButtonAway(mouseX, mouseY) {
+                const areaRect = area.getBoundingClientRect();
+                const btnRect = noBtn.getBoundingClientRect();
+                const maxX = Math.max(0, areaRect.width - btnRect.width);
+                const maxY = Math.max(0, areaRect.height - btnRect.height);
+
+                let bestLeft = noBtn.offsetLeft;
+                let bestTop = noBtn.offsetTop;
+                let bestDist = 0;
+
+                // Try a bunch of random positions and keep the farthest from the mouse
+                for (let i = 0; i < 30; i++) {
+                    const candLeft = Math.random() * maxX;
+                    const candTop = Math.random() * maxY;
+
+                    const cx = areaRect.left + candLeft + btnRect.width / 2;
+                    const cy = areaRect.top + candTop + btnRect.height / 2;
+                    const dx = mouseX - cx;
+                    const dy = mouseY - cy;
+                    const dist = Math.hypot(dx, dy);
+
+                    if (dist > bestDist) {
+                        bestDist = dist;
+                        bestLeft = candLeft;
+                        bestTop = candTop;
+                    }
+                }
+
+                noBtn.style.left = bestLeft + 'px';
+                noBtn.style.top = bestTop + 'px';
+
+                // Each time No escapes, make Yes a bit bigger (up to a cap)
+                if (yesBtn) {
+                    // Smaller increments but a larger possible final size
+                    yesScale = Math.min(6, yesScale + 0.035);
+                    yesBtn.style.transform = 'scale(' + yesScale.toFixed(2) + ')';
+                }
+            }
+
+            // Initialize the button in a starting spot (right of Yes)
+            requestAnimationFrame(() => {
+                const areaRect = area.getBoundingClientRect();
+                const btnRect = noBtn.getBoundingClientRect();
+                const startLeft = Math.min(areaRect.width - btnRect.width, areaRect.width * 0.6);
+                const startTop = Math.max(0, (areaRect.height - btnRect.height) / 2);
+                noBtn.style.left = startLeft + 'px';
+                noBtn.style.top = startTop + 'px';
+            });
+
+            area.addEventListener('mousemove', (e) => {
+                const btnRect = noBtn.getBoundingClientRect();
+                const cx = btnRect.left + btnRect.width / 2;
+                const cy = btnRect.top + btnRect.height / 2;
+                const dx = e.clientX - cx;
+                const dy = e.clientY - cy;
+                const dist = Math.hypot(dx, dy);
+
+                if (dist < THRESHOLD) {
+                    moveNoButtonAway(e.clientX, e.clientY);
+                    if (emoji && !emojiLockedOn) {
+                        emojiLockedOn = true;
+                        emoji.classList.add('show');
+                    }
+                }
+            });
+        })();
 
         // Skip button for testing: jump straight to the valentine question
         document.getElementById('skipPuzzleBtn').addEventListener('click', () => {
             const puzzleView = document.getElementById('puzzleView');
-            puzzleView.classList.remove('visible');
-            questionView.classList.add('visible');
+            switchView(puzzleView, questionView, true);
         });
 
         // --- Wordsearch logic ---
-        let WORDS = ['LOVELY','BEAUTIFUL','GORGEOUS','AMAZING','VALENTINE','PRETTY','SWEET','CUTE','MINE'];
+        let WORDS = ['LOVELY','BEAUTIFUL','GORGEOUS','AMAZING','VALENTINE','PRETTY','SWEET','CUTE','MINE','KIND'];
         let gridRows = 12, gridCols = 12;
         let grid = [];
         let owners = [];// parallel 2D array: list of word indices owning each cell
@@ -1413,7 +1717,8 @@
         let selected = [];
         let foundWords = new Set();
 
-        function initWordsearch() {
+        // Core generator: builds one candidate grid
+        function generateWordsearchOnce() {
             // initialize empty grid, owners and ownersUsedCount
             grid = Array.from({length: gridRows}, () => Array(gridCols).fill(''));
             owners = Array.from({length: gridRows}, () => Array.from({length: gridCols}, () => []));
@@ -1421,7 +1726,7 @@
 
             // Force certain words to be diagonal (place these first)
             const words = WORDS.slice();
-            const diagList = ['VALENTINE','PRETTY','SWEET','CUTE'];
+            const diagList = ['VALENTINE','PRETTY','SWEET','CUTE','KIND'];
             const diagIndices = new Set();
             words.forEach((w, i) => {
                 const up = w.toUpperCase();
@@ -1568,14 +1873,81 @@
 
             // fill remaining empty cells with random letters
             for (let r = 0; r < gridRows; r++) for (let c = 0; c < gridCols; c++) if (!grid[r][c]) grid[r][c] = randomLetter();
+        }
+
+        function randomLetter() { return String.fromCharCode(65 + Math.floor(Math.random()*26)); }
+
+        // Helpers to verify that every word actually appears in the grid
+        function checkDiagonalInGrid(word) {
+            const diagDirs = [
+                {dr: 1, dc: 1},
+                {dr: 1, dc: -1},
+                {dr: -1, dc: 1},
+                {dr: -1, dc: -1}
+            ];
+            for (let startR = 0; startR < gridRows; startR++) {
+                for (let startC = 0; startC < gridCols; startC++) {
+                    for (const {dr, dc} of diagDirs) {
+                        let found = '';
+                        for (let i = 0; i < word.length; i++) {
+                            const r = startR + i * dr;
+                            const c = startC + i * dc;
+                            if (r < 0 || r >= gridRows || c < 0 || c >= gridCols) break;
+                            found += grid[r][c];
+                        }
+                        if (found === word || found === word.split('').reverse().join('')) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        function checkWordInGrid(word) {
+            word = word.toUpperCase();
+            const reversed = word.split('').reverse().join('');
+
+            // horizontal
+            for (let r = 0; r < gridRows; r++) {
+                for (let c = 0; c <= gridCols - word.length; c++) {
+                    let found = '';
+                    for (let i = 0; i < word.length; i++) found += grid[r][c + i];
+                    if (found === word || found === reversed) return true;
+                }
+            }
+
+            // vertical
+            for (let c = 0; c < gridCols; c++) {
+                for (let r = 0; r <= gridRows - word.length; r++) {
+                    let found = '';
+                    for (let i = 0; i < word.length; i++) found += grid[r + i][c];
+                    if (found === word || found === reversed) return true;
+                }
+            }
+
+            // diagonal
+            return checkDiagonalInGrid(word);
+        }
+
+        function allWordsPresentInGrid() {
+            return WORDS.every(w => checkWordInGrid(w));
+        }
+
+        // Public initializer: keep regenerating until every word is present (with a safety cap)
+        function initWordsearch() {
+            const maxAttempts = 30;
+            let attempts = 0;
+            do {
+                generateWordsearchOnce();
+                attempts++;
+            } while (!allWordsPresentInGrid() && attempts < maxAttempts);
 
             renderWordGrid();
             renderWordList();
             document.getElementById('clearSelectionBtn').onclick = clearSelection;
             setupDragHandlers();
         }
-
-        function randomLetter() { return String.fromCharCode(65 + Math.floor(Math.random()*26)); }
 
         function placeWord(word, row, col, dir) {
             word = word.toUpperCase();
@@ -1826,10 +2198,14 @@
         
         function runConfettiFor(ms, intensity) {
             const end = Date.now() + ms;
+            const start = Date.now();
             function tick() {
-                if (Date.now() < end) {
-                    for (let i = 0; i < intensity; i++) {
-                        createConfetti();
+                const now = Date.now();
+                if (now < end) {
+                    const progress = (now - start) / ms;
+                    const currentIntensity = Math.ceil(intensity * (1 - progress));
+                    for (let i = 0; i < currentIntensity; i++) {
+                        createConfetti(end - now);
                     }
                     setTimeout(tick, 80);
                 }
@@ -1837,10 +2213,10 @@
             tick();
         }
         
-        function createConfetti() {
+        function createConfetti(timeLeft) {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
-            confetti.textContent = '💋';
+            confetti.textContent = ['💋', '💋', '🌹'][Math.floor(Math.random() * 3)];
             confetti.style.left = Math.random() * 100 + '%';
             confetti.style.top = '-40px';
             const duration = 3 + Math.random() * 3;
