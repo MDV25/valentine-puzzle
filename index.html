@@ -398,21 +398,14 @@
 
         /* Bloom-from-center effect for the final success screen */
         @keyframes successBloomIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.85);
-                filter: blur(6px) brightness(1.15);
+            0%{
+                box-shadow: inset 0 0 400px 4800px #FFDAE9;
             }
-            60% {
-                opacity: 1;
-                transform: scale(1.04);
-                filter: blur(1.5px) brightness(1.05);
+            
+            100%{
+                box-shadow: inset 0 0 80px 20px #FFDAE9;
             }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-                filter: none;
-            }
+            
         }
 
         .heart {
@@ -478,6 +471,21 @@
                 transform: scale(1) rotate(180deg);
                 opacity: 0;
             }
+        }
+
+        /* Full-screen inset glow overlay for the final scene */
+        .success-vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            animation: successBloomIn 8s forwards;
+        }
+
+        .success-vignette.show {
+            opacity: 1;
         }
 
         /* Celebration effect when puzzle solved */
@@ -722,19 +730,19 @@
             color: #111;
             margin-bottom: 20px;
         }
+        
+            /* Final success title: appear slightly after the vignette glow */
+            .success-final-title {
+                opacity: 0;
+                transform: translateY(10px);
+                transition: opacity 0.6s ease, transform 0.6s ease;
+            }
+        
+            .success-final-title.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
 
-        .success-gif-wrap {
-            margin: 0 auto 24px;
-            border-radius: 12px;
-            overflow: hidden;
-            max-width: 420px;
-        }
-
-        .success-gif-wrap img {
-            display: block;
-            width: 100%;
-            height: auto;
-        }
 
         /* Photo tape background: vertically scrolling columns of photos */
         .photo-tape-bg {
@@ -743,6 +751,12 @@
             background: #FFDAE9;
             overflow: hidden;
             z-index: -3; /* sit fully behind all success content */
+            opacity: 0;
+            transition: opacity 3s ease;
+        }
+
+        .photo-tape-bg.photo-tape-bg--visible {
+            opacity: 1;
         }
 
         /* Fade the photo columns out at the very top and bottom edges */
@@ -917,7 +931,7 @@
 
         .word-cell.shared {
             box-shadow: inset 0 -6px 0 rgba(0,0,0,0.04);
-            background: linear-gradient(180deg, #9ef8c3 0%, #66917f 100%);
+            background: linear-gradient(180deg, #b5dac4 0%, #b9e3d1 100%);
             color: #367c3c;
         }
 
@@ -994,7 +1008,7 @@
         }
 
         #successView.success-fade-in {
-            animation: successBloomIn 0.85s cubic-bezier(.16,.84,.44,1) forwards;
+            animation: successBloomIn 1.05s cubic-bezier(0.16, 0.84, 0.24, 1) forwards;
         }
 
     </style>
@@ -1014,6 +1028,8 @@
             </div>
         </div>
     </div>
+
+    <div class="success-vignette" id="successVignette"></div>
 
     <div class="container">
         <div class="modal-inner">
@@ -1331,7 +1347,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="modal-title" style="position: relative; z-index: 2;">Yay, I can't wait to <br>see you baby <3</p>
+                <p class="modal-title success-final-title" style="position: relative; z-index: 2;">Yay, I can't wait to <br>see you baby <3</p>
                 <div class="photo-tape-display">
                     <div class="photo-tape-grid">
                         <div class="tape-photo"></div>
@@ -1345,7 +1361,7 @@
                         <div class="tape-photo"></div>
                     </div>
                 </div>
-                <button type="button" class="reset-btn" id="resetBtn" style="position: relative; z-index: 2;">↻</button>
+                <button type="button" class="reset-btn success-final-title" id="resetBtn" style="position: relative; z-index: 2;">↻</button>
             </div>
         </div>
     </div>
@@ -1646,7 +1662,11 @@
 
         // Attach yes button handler (works for both normal and skip flow)
         document.getElementById('yesBtn').addEventListener('click', () => {
-            runConfettiFor(20000, 4);
+            // Delay the heart/emoji confetti so it starts a bit after
+            // the final vignette / box-shadow animation begins.
+            setTimeout(() => {
+                runConfettiFor(20000, 4);
+            }, 1400);
             // Switch the container into full-screen success mode
             container.classList.add('container--success');
 
@@ -1659,6 +1679,29 @@
             if (successView) {
                 successView.classList.remove('turn-in', 'turn-out');
                 successView.classList.add('visible', 'success-fade-in');
+            }
+
+            // Show the vignette overlay on top of everything
+            const vignette = document.getElementById('successVignette');
+            if (vignette) vignette.classList.add('show');
+
+            // Gently fade in the scrolling photo columns after the vignette begins
+            const tapeBg = successView ? successView.querySelector('.photo-tape-bg') : null;
+            if (tapeBg) {
+                // Small delay so the background appears under the already-growing pink vignette
+                setTimeout(() => {
+                    tapeBg.classList.add('photo-tape-bg--visible');
+                }, 250);
+            }
+
+            // Delay the final "I can't wait..." text and reset button
+            // until after the vignette has bloomed
+            const finalEls = successView ? successView.querySelectorAll('.success-final-title') : null;
+            if (finalEls && finalEls.length) {
+                finalEls.forEach(el => el.classList.remove('show'));
+                setTimeout(() => {
+                    finalEls.forEach(el => el.classList.add('show'));
+                }, 450);
             }
         });
 
