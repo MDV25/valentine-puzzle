@@ -247,7 +247,7 @@
         }
 
         .puzzle-container {
-            width: 40vh;
+            width: min(70vmin, 520px);
             max-width: 100%;
             margin: 0 auto;
             background: #f5f5f5;
@@ -592,7 +592,7 @@
                 font-size: 20px;
             }
             .puzzle-container {
-                max-width: min(360px, 40vh);
+                width: min(72vmin, 420px);
             }
         }
 
@@ -623,7 +623,7 @@
                 font-size: 18px;
             }
             .puzzle-container {
-                max-width: min(280px, 40vh);
+                width: min(76vmin, 360px);
             }
         }
 
@@ -653,7 +653,7 @@
                 font-size: 16px;
             }
             .puzzle-container {
-                max-width: min(240px, 40vh);
+                width: min(78vmin, 320px);
             }
         }
 
@@ -1346,6 +1346,71 @@
             animation: successBloomIn 1.05s cubic-bezier(0.16, 0.84, 0.24, 1) forwards;
         }
 
+        /* Progress bar */
+        .progress-shell {
+            position: fixed;
+            top: 18px;
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            width: min(520px, calc(100vw - 32px));
+            z-index: 12;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .progress-shell.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translate3d(-50%, -60px, 0);
+        }
+
+        body.show-modal .progress-shell {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .progress-track {
+            position: relative;
+            height: 10px;
+            background: #f3dbe8;
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 999px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            margin-top: 6px;
+            font-size: 11px;
+            color: #7b5471;
+            font-weight: 600;
+        }
+
+        .progress-step {
+            text-align: center;
+        }
+
+        .progress-step.active {
+            color: #c41e3a;
+        }
+
+        .progress-steps.message {
+            grid-template-columns: 1fr;
+            text-align: center;
+            font-size: 12px;
+            color: #c41e3a;
+        }
+
     </style>
 </head>
 <body>
@@ -1366,11 +1431,24 @@
 
     <div class="success-vignette" id="successVignette"></div>
 
+    <div class="progress-shell" aria-label="Puzzle progress">
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-steps" id="progressSteps">
+            <span class="progress-step" data-step="0">Puzzle</span>
+            <span class="progress-step" data-step="1">Wordsearch</span>
+            <span class="progress-step" data-step="2">Wordle</span>
+            <span class="progress-step" data-step="3">Sudoku</span>
+            <span class="progress-step" data-step="4">Minesweeper</span>
+        </div>
+    </div>
+
     <div class="container">
         <div class="modal-inner">
             <!-- VIEW: Puzzle (playing + completed state in same view) -->
             <div id="puzzleView" class="modal-view">
-                <h1 class="modal-title">Dear Elyssa...</h1>
+                <h1 class="modal-title">Made for the love of my life <3</h1>
                 <div class="puzzle-container" id="puzzleContainer">
                     <div class="puzzle-grid-wrap" id="puzzleGridWrap">
                         <div class="puzzle-grid" id="puzzleGrid"></div>
@@ -1382,11 +1460,10 @@
                 <div class="puzzle-reveal-text" id="puzzleRevealText">
                     <p class="complete-line">...you complete me.</p>
                 </div>
-                <button id="skipPuzzleBtn" style="margin-top: 12px; padding: 8px 16px; font-size: 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; color: #666;">Skip</button>
             </div>
             <!-- WORDSEARCH VIEW: shown after first puzzle -->
             <div id="wordsearchView" class="modal-view">
-                <p style="margin-bottom:8px;">Find these words:</p>
+                <p style="margin-bottom:8px;">Find these words that make me think of you:</p>
                 <ul class="word-list" id="wordList">
                     <li data-word="LOVELY">Lovely</li>
                     <li data-word="BEAUTIFUL">Beautiful</li>
@@ -1407,12 +1484,10 @@
                         <button id="clearSelectionBtn" class="word-clear-btn">Clear</button>
                     </div>
                 </div>
-                <button id="skipWordsearchBtn" style="margin-top: 12px; padding: 8px 16px; font-size: 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; color: #666;">Skip</button>
             </div>
 
             <!-- WORDLE VIEW: appears after completing the wordsearch -->
             <div id="wordleView" class="modal-view">
-                <p class="modal-title" style="margin-bottom: 8px;">One more little game... 💌</p>
                 <p style="font-size: 14px; color: #555; margin-bottom: 6px; text-align: center; max-width: 420px;">Guess the 5-letter word that describes how I feel about you.</p>
                 <div class="wordle-container">
                     <div class="wordle-rows" id="wordleRows"></div>
@@ -1422,19 +1497,17 @@
                     </div>
                     <div class="wordle-message" id="wordleMessage"></div>
                 </div>
-                <button id="skipWordleBtn" style="margin-top: 10px; padding: 8px 16px; font-size: 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; color: #666;">Skip</button>
             </div>
 
             <!-- SUDOKU VIEW: appears after Wordle, before the question -->
             <div id="sudokuView" class="modal-view">
                 <p class="modal-title" style="margin-bottom: 8px;">Sudoku break 🧩</p>
-                <p style="font-size: 14px; color: #555; margin-bottom: 6px; text-align: center; max-width: 420px;">Fill the grid to unlock the question.</p>
+                <p style="font-size: 14px; color: #555; margin-bottom: 6px; text-align: center; max-width: 420px;">Fill the grid to unlock a memory.</p>
                 <div class="sudoku-container">
                     <div class="sudoku-grid" id="sudokuGrid" aria-label="Sudoku grid" role="grid"></div>
                     <div class="sudoku-keypad" id="sudokuKeypad" aria-label="Sudoku keypad"></div>
                     <div class="sudoku-message" id="sudokuMessage"></div>
                 </div>
-                <button id="skipSudokuBtn" style="margin-top: 10px; padding: 8px 16px; font-size: 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; color: #666;">Skip</button>
             </div>
 
             <!-- MINESWEEPER VIEW: appears after Sudoku, before the question -->
@@ -1449,7 +1522,6 @@
                     </div>
                     <div class="minesweeper-message" id="minesweeperMessage"></div>
                 </div>
-                <button id="skipMinesweeperBtn" style="margin-top: 10px; padding: 8px 16px; font-size: 12px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; color: #666;">Skip</button>
             </div>
 
             <!-- QUESTION VIEW: appears after completing the wordsearch; hides the wordsearch when shown -->
@@ -1762,12 +1834,13 @@
         const sudokuGridEl = document.getElementById('sudokuGrid');
         const sudokuKeypadEl = document.getElementById('sudokuKeypad');
         const sudokuMessageEl = document.getElementById('sudokuMessage');
-        const sudokuSkipBtn = document.getElementById('skipSudokuBtn');
         const minesweeperGridEl = document.getElementById('minesweeperGrid');
         const minesweeperMessageEl = document.getElementById('minesweeperMessage');
         const minesweeperFlagBtn = document.getElementById('minesweeperFlagBtn');
         const minesweeperResetBtn = document.getElementById('minesweeperResetBtn');
-        const minesweeperSkipBtn = document.getElementById('skipMinesweeperBtn');
+        const progressShell = document.querySelector('.progress-shell');
+        const progressFill = document.getElementById('progressFill');
+        const progressSteps = document.getElementById('progressSteps');
         const container = document.querySelector('.container');
 
         const WORDLE_TARGET = 'CRAZY'; // Set the 5-letter Wordle word here
@@ -1810,6 +1883,8 @@
         let minesweeperFlagMode = false;
         let minesweeperGameOver = false;
         let minesweeperRevealedCount = 0;
+
+        const PUZZLE_ORDER = ['puzzleView', 'wordsearchView', 'wordleView', 'sudokuView', 'minesweeperView'];
         
         /**
          * Switch from one modal view to another with a page-turn animation.
@@ -1819,6 +1894,8 @@
         function switchView(fromEl, toEl, forward = true) {
             if (!toEl) return;
             const duration = 750; // ms, should match CSS
+
+            updateProgressForView(toEl.id);
 
             const origin = forward ? 'left center' : 'right center';
             if (fromEl) {
@@ -1839,6 +1916,17 @@
                 toEl.classList.remove('turn-in');
                 toEl.style.transformOrigin = '';
             }, duration + 30);
+        }
+
+        function updateProgressForView(viewId) {
+            const index = PUZZLE_ORDER.indexOf(viewId);
+            if (index === -1 || !progressFill || !progressSteps) return;
+            const percent = ((index + 1) / PUZZLE_ORDER.length) * 100;
+            progressFill.style.width = `${percent}%`;
+            Array.from(progressSteps.children).forEach((step, stepIndex) => {
+                if (stepIndex <= index) step.classList.add('active');
+                else step.classList.remove('active');
+            });
         }
         
         envelope.addEventListener('click', () => {
@@ -2087,6 +2175,7 @@
         const observer = new MutationObserver(() => {
             if (successView.classList.contains('visible')) {
                 populatePhotoTape();
+                if (progressShell) progressShell.classList.add('hidden');
                 observer.disconnect();
             }
         });
@@ -2137,6 +2226,10 @@
                 setTimeout(() => {
                     finalEls.forEach(el => el.classList.add('show'));
                 }, 450);
+            }
+
+            if (progressShell) {
+                progressShell.classList.add('hidden');
             }
         });
 
@@ -2219,55 +2312,13 @@
             });
         })();
 
-        // Skip buttons: move to the next view in sequence
-        document.getElementById('skipPuzzleBtn').addEventListener('click', () => {
-            const puzzleView = document.getElementById('puzzleView');
-            const wordsearchView = document.getElementById('wordsearchView');
-            if (puzzleView && wordsearchView) {
-                switchView(puzzleView, wordsearchView, true);
-                initWordsearch();
-            }
-        });
-
-        document.getElementById('skipWordsearchBtn').addEventListener('click', () => {
-            const wordsearchView = document.getElementById('wordsearchView');
-            if (wordsearchView && wordleView) {
-                switchView(wordsearchView, wordleView, true);
-                initWordle();
-            }
-        });
-
-        document.getElementById('skipWordleBtn').addEventListener('click', () => {
-            if (wordleView && sudokuView) {
-                switchView(wordleView, sudokuView, true);
-                initSudoku();
-            }
-        });
-
-        if (sudokuSkipBtn) {
-            sudokuSkipBtn.addEventListener('click', () => {
-                if (sudokuView && minesweeperView) {
-                    switchView(sudokuView, minesweeperView, true);
-                    initMinesweeper();
-                }
-            });
-        }
-
-        if (minesweeperSkipBtn) {
-            minesweeperSkipBtn.addEventListener('click', () => {
-                if (minesweeperView && questionView) {
-                    switchView(minesweeperView, questionView, true);
-                }
-            });
-        }
-
         // --- Wordle logic ---
         let wordleDictionary = null;
         let wordleDictionaryPromise = null;
 
         function loadWordleDictionary() {
             if (wordleDictionaryPromise) return wordleDictionaryPromise;
-            wordleDictionaryPromise = fetch('Wordle%20Word%20List/5-letter-words.txt')
+            wordleDictionaryPromise = fetch('wordle-word-list/5-letter-words.txt')
                 .then((response) => {
                     if (!response.ok) throw new Error('Failed to load word list');
                     return response.text();
@@ -2360,7 +2411,7 @@
             return result;
         }
 
-        function handleWordleGuess() {
+        async function handleWordleGuess() {
             if (wordleSolved) return;
             const rawGuess = wordleInput ? wordleInput.value : '';
             const guess = String(rawGuess || '').toUpperCase().replace(/[^A-Z]/g, '');
@@ -2372,6 +2423,15 @@
 
             if (!wordleDictionary) {
                 if (wordleMessage) wordleMessage.textContent = 'Loading word list...';
+                try {
+                    await loadWordleDictionary();
+                } catch (error) {
+                    // loadWordleDictionary already falls back; ignore.
+                }
+            }
+
+            if (!wordleDictionary) {
+                if (wordleMessage) wordleMessage.textContent = 'Word list is unavailable. Try again.';
                 return;
             }
 
