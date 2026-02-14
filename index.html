@@ -396,6 +396,25 @@
             to { opacity: 1; transform: scale(1); }
         }
 
+        /* Bloom-from-center effect for the final success screen */
+        @keyframes successBloomIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.85);
+                filter: blur(6px) brightness(1.15);
+            }
+            60% {
+                opacity: 1;
+                transform: scale(1.04);
+                filter: blur(1.5px) brightness(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+                filter: none;
+            }
+        }
+
         .heart {
             font-size: 4em;
             margin: 20px 0;
@@ -898,8 +917,8 @@
 
         .word-cell.shared {
             box-shadow: inset 0 -6px 0 rgba(0,0,0,0.04);
-            background: linear-gradient(180deg, #a8cdbd 0%, #54a47d 100%);
-            color: #32a56d;
+            background: linear-gradient(180deg, #9ef8c3 0%, #66917f 100%);
+            color: #367c3c;
         }
 
         .word-list {
@@ -967,6 +986,15 @@
         .word-cell {
             height: auto;
             font-size: clamp(10px, 1.6vmin + 6px, 18px);
+        }
+
+        /* Smooth bloom-in for the final success view instead of a page turn */
+        #successView {
+            transform-origin: center center;
+        }
+
+        #successView.success-fade-in {
+            animation: successBloomIn 0.85s cubic-bezier(.16,.84,.44,1) forwards;
         }
 
     </style>
@@ -1619,8 +1647,19 @@
         // Attach yes button handler (works for both normal and skip flow)
         document.getElementById('yesBtn').addEventListener('click', () => {
             runConfettiFor(20000, 4);
+            // Switch the container into full-screen success mode
             container.classList.add('container--success');
-            switchView(questionView, successView, true);
+
+            // Fade out the question view using its built-in opacity transition
+            if (questionView) {
+                questionView.classList.remove('visible', 'turn-in', 'turn-out');
+            }
+
+            // Fade in the success view with a smooth scale/opacity animation
+            if (successView) {
+                successView.classList.remove('turn-in', 'turn-out');
+                successView.classList.add('visible', 'success-fade-in');
+            }
         });
 
         // Make the "No" button run away when the cursor gets close
@@ -2216,7 +2255,7 @@
         function createConfetti(timeLeft) {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
-            confetti.textContent = ['💋', '💋', '🌹'][Math.floor(Math.random() * 3)];
+            confetti.textContent = ['💋', '🌹', '♥️'][Math.floor(Math.random() * 3)];
             confetti.style.left = Math.random() * 100 + '%';
             confetti.style.top = '-40px';
             const duration = 3 + Math.random() * 3;
