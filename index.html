@@ -1947,6 +1947,7 @@
                 }, 700);
             }, 380);
         });
+
         
         let tiles = [];
         
@@ -2148,7 +2149,7 @@
                 originals.forEach(placeholder => {
                     const photo = getRandomPhotoExcluding(photos, lastPhoto);
                     if (photo) {
-                        placeholder.style.backgroundImage = `url('images/memories/${photo}')`;
+                        placeholder.style.backgroundImage = `url('images/memories/Photos/${photo}')`;
                         placeholder.style.backgroundSize = 'cover';
                         placeholder.style.backgroundPosition = 'center';
                         lastPhoto = photo;
@@ -2163,7 +2164,7 @@
             fgPhotos.forEach(photo => {
                 const img = getRandomPhoto(photos);
                 if (img) {
-                    photo.style.backgroundImage = `url('images/memories/${img}')`;
+                    photo.style.backgroundImage = `url('images/memories/Photos/${img}')`;
                     photo.style.backgroundSize = 'cover';
                     photo.style.backgroundPosition = 'center';
                 }
