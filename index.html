@@ -119,18 +119,20 @@
         .envelope {
             position: relative;
             width: 220px;
-            height: 160px;
+            height: 400px;
             background: #f5e6d3;
             border: 1px solid #d4c4a8;
             border-radius: 4px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.12);
             cursor: pointer;
             transition: transform 0.25s ease, box-shadow 0.25s ease;
+            overflow: visible;
+            --paper-rise: 300px;
         }
 
         .envelope:hover:not(.opening) {
-            transform: scale(1.05);
             box-shadow: 0 8px 28px rgba(0,0,0,0.15);
+            animation: envelopeWiggle 0.6s ease-in-out infinite;
         }
 
         .envelope-flap {
@@ -144,6 +146,83 @@
             transform-origin: top center;
             transition: transform 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 3;
+        }
+
+        .envelope-flap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(165deg, #f4e7d8 0%, #ead8c4 60%, #d9c3a9 100%);
+            clip-path: polygon(0 0, 50% 46%, 100% 0);
+            transform-origin: top center;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        .envelope-paper {
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: 12px;
+            height: 90%;
+            background: #fff;
+            border-radius: 4px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.5s ease, transform 0.6s ease;
+            z-index: 1;
+        }
+
+        .envelope-paper-text {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            font-family: 'Pinyon Script', cursive;
+            font-size: 18px;
+            color: #5b3f48;
+            pointer-events: none;
+        }
+
+        .envelope-paper-body {
+            position: absolute;
+            top: 38px;
+            left: 12px;
+            right: 12px;
+            font-family: 'Pinyon Script', cursive;
+            bottom: 12px;
+            font-size: 7px;
+            line-height: 1.4;
+            color: rgba(178, 171, 173, 0.6);
+            letter-spacing: 0.3px;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .envelope-bottom-left,
+        .envelope-bottom-right {
+            position: absolute;
+            bottom: 0;
+            width: 50%;
+            height: 64%;
+            background: linear-gradient(160deg, #fbead7 0%, #f1ddc7 100%);
+            z-index: 5;
+        }
+
+        .envelope-bottom-left {
+            left: 0;
+            clip-path: polygon(0% 0%, 0% 100%, 100% 100%, 100% 50%);
+            z-index: 5;
+            
+        }
+
+        .envelope-bottom-right {
+            right: 0;
+            clip-path: polygon(100% 0%, 100% 100%, 0% 100%, 0% 50%);
+            z-index: 5;
+            
         }
 
         .envelope-flap-outline {
@@ -163,16 +242,27 @@
             transform: rotateX(-170deg);
         }
 
+        .envelope.opening .envelope-paper {
+            opacity: 1;
+            transform: translateY(0);
+            z-index: 4;
+        }
+
+        #envelopeStage.envelope-stage-fade-out .envelope-paper {
+            opacity: 1;
+            transform: translateY(calc(-1 * var(--paper-rise)));
+        }
+
         .envelope-heart {
             position: absolute;
             top: 50%;
-            left: 50%;
+            left: 48%;
             transform: translate(-50%, -50%);
             width: 40px;
             height: 40px;
             color: #c41e3a;
             pointer-events: none;
-            z-index: 1;
+            z-index: 4;
             transition: opacity 0.35s ease;
         }
 
@@ -181,14 +271,15 @@
         }
 
         .envelope-heart svg {
-            width: 100%;
-            height: 100%;
+            width: 120%;
+            height: 120%;
         }
 
         @media (min-width: 768px) {
             .envelope {
                 width: 300px;
                 height: 218px;
+                --paper-rise: 110px;
             }
             .envelope-heart {
                 width: 52px;
@@ -200,6 +291,7 @@
             .envelope {
                 width: 340px;
                 height: 247px;
+                --paper-rise: 130px;
             }
             .envelope-heart {
                 width: 58px;
@@ -208,7 +300,7 @@
         }
 
         .envelope-stage-fade-out {
-            animation: envelopeFadeOut 0.5s ease forwards;
+            animation: envelopeFadeOut 1.6s ease forwards;
         }
 
         .puzzle-stage-fade-in {
@@ -216,7 +308,7 @@
         }
 
         @keyframes envelopeFadeOut {
-            to { opacity: 0; transform: scale(0.96); }
+            to { opacity: 0.5; transform: scale(4) translate(0%,30%);}
         }
 
         .modal-view .modal-title {
@@ -310,8 +402,16 @@
         .puzzle-tile:hover:not(.empty) {
             transform: scale(1.01);
             box-shadow: 0 0px 10px rgba(0,0,0,0.2);
-            z-index: 10;
         }
+
+        @keyframes envelopeWiggle {
+            0% { transform: scale(1.05) rotate(0deg); }
+            25% { transform: scale(1.05) rotate(2deg); }
+            50% { transform: scale(1.05) rotate(-1.5deg); }
+            75% { transform: scale(1.05) rotate(0.4deg); }
+            100% { transform: scale(1.05) rotate(0deg); }
+        }
+        
 
         .puzzle-grid.merging .puzzle-tile {
             box-shadow: none;
@@ -972,7 +1072,14 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 8px 16px;
+            padding: 16px 16px;
+        }
+
+        #puzzleView,
+        #wordsearchView,
+        #sudokuView,
+        #minesweeperView {
+            overflow: hidden;
         }
 
         /* Ensure the wordsearch container fills the available space and the grid cells scale to fit */
@@ -1009,7 +1116,7 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            padding: 8px 16px 16px;
+            padding: 16px 16px 16px;
         }
 
         .wordle-container {
@@ -1113,7 +1220,7 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            padding: 8px 16px 16px;
+            padding: 16px 16px 16px;
         }
 
         .sudoku-container {
@@ -1165,8 +1272,9 @@
 
         .sudoku-cell.fixed {
             background: #f1e9f3;
-            color: #6a5266;
+            color: #c65990;
             cursor: default;
+            box-shadow: inset 0 0 1px 1px #c6bcc8;
         }
 
         .sudoku-cell.fixed.revealed {
@@ -1175,8 +1283,18 @@
         }
 
         .sudoku-cell.active {
-            background: #ffe7f1;
-            box-shadow: inset 0 0 0 2px #f5576c;
+            background: #eed6e6;
+            box-shadow: inset 0 0 0 2px #f557b6;
+        }
+
+        .sudoku-cell.highlight {
+            background: #fbe9f2;
+        }
+
+        .sudoku-cell.conflict {
+            background: #ffe1e1;
+            color: #ff002f;
+            box-shadow: inset 0 0 0 2px #e26d6d;
         }
 
 
@@ -1195,6 +1313,13 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
+        }
+
+        .sudoku-key:disabled {
+            background: #d9d4d7;
+            color: #8a7f86;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
         .sudoku-key.clear {
@@ -1257,7 +1382,7 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            padding: 8px 16px 16px;
+            padding: 16px 16px 16px;
         }
 
         .minesweeper-container {
@@ -1349,7 +1474,7 @@
         /* Progress bar */
         .progress-shell {
             position: fixed;
-            top: 18px;
+            top: 10px;
             left: 50%;
             transform: translate3d(-50%, 0, 0);
             width: min(520px, calc(100vw - 32px));
@@ -1357,6 +1482,39 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .progress-skip {
+            border: none;
+            background: #fff;
+            color: #c41e3a;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 999px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-track-wrap {
+            flex: 1 1 auto;
+        }
+
+        .progress-skip:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .progress-skip:focus-visible {
+            outline: 2px solid rgba(196, 30, 58, 0.35);
+            outline-offset: 2px;
         }
 
         .progress-shell.hidden {
@@ -1398,10 +1556,22 @@
 
         .progress-step {
             text-align: center;
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            color: inherit;
+            cursor: pointer;
         }
 
         .progress-step.active {
             color: #c41e3a;
+        }
+
+        .progress-step:focus-visible {
+            outline: 2px solid rgba(196, 30, 58, 0.35);
+            outline-offset: 2px;
+            border-radius: 6px;
         }
 
         .progress-steps.message {
@@ -1420,6 +1590,33 @@
             <div class="envelope-heart" aria-hidden="true">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" clip-rule="evenodd" /></svg>
             </div>
+            <div class="envelope-paper" aria-hidden="true">
+                <span class="envelope-paper-text">Dear, Elyssa</span>
+                <span class="envelope-paper-body">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </span>
+            </div>
+            <div class="envelope-bottom-left" aria-hidden="true"></div>
+            <div class="envelope-bottom-right" aria-hidden="true"></div>
             <div class="envelope-flap">
                 <svg class="envelope-flap-outline" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                     <line x1="0" y1="0" x2="50" y2="50" stroke="#d4c4a8" stroke-width="3" vector-effect="non-scaling-stroke" />
@@ -1432,15 +1629,20 @@
     <div class="success-vignette" id="successVignette"></div>
 
     <div class="progress-shell" aria-label="Puzzle progress">
-        <div class="progress-track">
-            <div class="progress-fill" id="progressFill"></div>
+        <div class="progress-row">
+            <div class="progress-track-wrap">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            <button class="progress-skip" id="skipToQuestionBtn" type="button" aria-label="Skip to Question" title="Skip to Question">&gt;&gt;</button>
         </div>
         <div class="progress-steps" id="progressSteps">
-            <span class="progress-step" data-step="0">Puzzle</span>
-            <span class="progress-step" data-step="1">Wordsearch</span>
-            <span class="progress-step" data-step="2">Wordle</span>
-            <span class="progress-step" data-step="3">Sudoku</span>
-            <span class="progress-step" data-step="4">Minesweeper</span>
+            <button class="progress-step" data-step="0" type="button">Puzzle</button>
+            <button class="progress-step" data-step="1" type="button">Wordsearch</button>
+            <button class="progress-step" data-step="2" type="button">Wordle</button>
+            <button class="progress-step" data-step="3" type="button">Sudoku</button>
+            <button class="progress-step" data-step="4" type="button">Minesweeper</button>
         </div>
     </div>
 
@@ -1448,7 +1650,7 @@
         <div class="modal-inner">
             <!-- VIEW: Puzzle (playing + completed state in same view) -->
             <div id="puzzleView" class="modal-view">
-                <h1 class="modal-title">Made for the love of my life <3</h1>
+                <h1 class="modal-title">You complete me <3</h1>
                 <div class="puzzle-container" id="puzzleContainer">
                     <div class="puzzle-grid-wrap" id="puzzleGridWrap">
                         <div class="puzzle-grid" id="puzzleGrid"></div>
@@ -1488,7 +1690,7 @@
 
             <!-- WORDLE VIEW: appears after completing the wordsearch -->
             <div id="wordleView" class="modal-view">
-                <p style="font-size: 14px; color: #555; margin-bottom: 6px; text-align: center; max-width: 420px;">Guess the 5-letter word for how I feel about you.</p>
+                <p style="font-size: 14px; color: #555; margin-bottom: 6px; text-align: center; max-width: 420px;">Guess the 5-letter word for how I describe you.</p>
                 <div class="wordle-container">
                     <div class="wordle-rows" id="wordleRows"></div>
                     <div class="wordle-input-row">
@@ -1841,14 +2043,17 @@
         const progressShell = document.querySelector('.progress-shell');
         const progressFill = document.getElementById('progressFill');
         const progressSteps = document.getElementById('progressSteps');
+        const skipToQuestionBtn = document.getElementById('skipToQuestionBtn');
         const container = document.querySelector('.container');
 
-        const WORDLE_TARGET = 'CRAZY'; // Set the 5-letter Wordle word here
+        const WORDLE_TARGETS = ['CRAZY', 'FUNNY', 'SWEET', 'LOYAL', 'LOVER', 'TRUST', 'PROUD', 'CUTIE'];
         const WORDLE_MAX_GUESSES = 6;
         let wordleAttempts = [];
         let wordleSolved = false;
         let wordleExtraChanceUsed = false;
-        const wordleTarget = sanitizeWordleTarget(WORDLE_TARGET);
+        const wordleTarget = sanitizeWordleTarget(
+            WORDLE_TARGETS[Math.floor(Math.random() * WORDLE_TARGETS.length)]
+        );
 
         const SUDOKU_PUZZLE = [
             [0, 0, 0, 2, 6, 0, 7, 0, 1],
@@ -1885,6 +2090,9 @@
         let minesweeperRevealedCount = 0;
 
         const PUZZLE_ORDER = ['puzzleView', 'wordsearchView', 'wordleView', 'sudokuView', 'minesweeperView'];
+        let currentViewId = null;
+        let navEpoch = 0;
+        let viewSwitchToken = 0;
         
         /**
          * Switch from one modal view to another with a page-turn animation.
@@ -1894,27 +2102,45 @@
         function switchView(fromEl, toEl, forward = true) {
             if (!toEl) return;
             const duration = 750; // ms, should match CSS
+            const token = String(++viewSwitchToken);
 
             updateProgressForView(toEl.id);
+            currentViewId = toEl.id;
+
+            document.querySelectorAll('.modal-view.visible').forEach((view) => {
+                if (view !== toEl && view !== fromEl) {
+                    view.classList.remove('visible', 'turn-in', 'turn-out');
+                    view.style.transformOrigin = '';
+                    view.dataset.showToken = '';
+                    view.dataset.hideToken = '';
+                }
+            });
 
             const origin = forward ? 'left center' : 'right center';
             if (fromEl) {
                 fromEl.style.transformOrigin = origin;
+                fromEl.classList.remove('turn-in');
                 fromEl.classList.add('turn-out');
+                fromEl.dataset.hideToken = token;
             }
 
             toEl.style.transformOrigin = origin;
+            toEl.classList.remove('turn-out');
             toEl.classList.add('turn-in');
             toEl.classList.add('visible');
+            toEl.dataset.showToken = token;
+            toEl.dataset.hideToken = '';
 
             // cleanup after animation completes
             setTimeout(() => {
-                if (fromEl) {
+                if (fromEl && fromEl.dataset.hideToken === token && fromEl.id !== currentViewId) {
                     fromEl.classList.remove('visible', 'turn-out');
                     fromEl.style.transformOrigin = '';
                 }
-                toEl.classList.remove('turn-in');
-                toEl.style.transformOrigin = '';
+                if (toEl && toEl.dataset.showToken === token && toEl.id === currentViewId) {
+                    toEl.classList.remove('turn-in');
+                    toEl.style.transformOrigin = '';
+                }
             }, duration + 30);
         }
 
@@ -1926,6 +2152,61 @@
             Array.from(progressSteps.children).forEach((step, stepIndex) => {
                 if (stepIndex <= index) step.classList.add('active');
                 else step.classList.remove('active');
+            });
+        }
+
+        function ensureViewReady(viewId) {
+            if (viewId === 'wordsearchView') {
+                const gridEl = document.getElementById('wordGrid');
+                if (gridEl && gridEl.children.length === 0) initWordsearch();
+            } else if (viewId === 'wordleView') {
+                if (wordleRowsEl && wordleRowsEl.children.length === 0) initWordle();
+            } else if (viewId === 'sudokuView') {
+                if (sudokuGridEl && sudokuGridEl.children.length === 0) initSudoku();
+            } else if (viewId === 'minesweeperView') {
+                if (minesweeperGridEl && minesweeperGridEl.children.length === 0) initMinesweeper();
+            }
+        }
+
+        function jumpToProgressStep(stepIndex) {
+            if (Number.isNaN(stepIndex) || stepIndex < 0) return;
+            if (stepIndex >= PUZZLE_ORDER.length) return;
+
+            const targetViewId = PUZZLE_ORDER[stepIndex];
+            const targetEl = document.getElementById(targetViewId);
+            const fromEl = currentViewId ? document.getElementById(currentViewId) : null;
+            if (!targetEl || targetEl === fromEl) return;
+
+            navEpoch += 1;
+            ensureViewReady(targetViewId);
+            const currentIndex = currentViewId ? PUZZLE_ORDER.indexOf(currentViewId) : -1;
+            const forward = currentIndex === -1 ? true : stepIndex >= currentIndex;
+            switchView(fromEl, targetEl, forward);
+        }
+
+        if (progressSteps) {
+            Array.from(progressSteps.children).forEach((step) => {
+                step.addEventListener('click', () => {
+                    const stepIndex = Number(step.getAttribute('data-step'));
+                    jumpToProgressStep(stepIndex);
+                });
+                step.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        const stepIndex = Number(step.getAttribute('data-step'));
+                        jumpToProgressStep(stepIndex);
+                    }
+                });
+            });
+        }
+
+        if (skipToQuestionBtn) {
+            skipToQuestionBtn.addEventListener('click', () => {
+                navEpoch += 1;
+                if (questionView) {
+                    const fromEl = currentViewId ? document.getElementById(currentViewId) : null;
+                    switchView(fromEl, questionView, true);
+                }
             });
         }
         
@@ -2025,6 +2306,7 @@
         }
         
         function onPuzzleSolved() {
+            const epoch = navEpoch;
             const puzzleContainer = document.getElementById('puzzleContainer');
             const puzzleGridWrap = document.getElementById('puzzleGridWrap');
             const puzzleRevealText = document.getElementById('puzzleRevealText');
@@ -2042,8 +2324,10 @@
                     requestAnimationFrame(() => {
                         requestAnimationFrame(() => {
                             const wordsearchView = document.getElementById('wordsearchView');
-                            switchView(puzzleView, wordsearchView, true);
-                            initWordsearch();
+                            if (navEpoch === epoch && currentViewId === 'puzzleView') {
+                                switchView(puzzleView, wordsearchView, true);
+                                initWordsearch();
+                            }
                         });
                     });
                 }, 3000);
@@ -2071,6 +2355,9 @@
         });
 
         // Photo loading from memories folder
+        const PHOTO_BASE_PATH = 'images/memories/Photos/';
+        const photoPreloadCache = new Map();
+
         async function loadPhotosFromManifest() {
             try {
                 const response = await fetch('images/memories/manifest.json');
@@ -2098,6 +2385,59 @@
             return candidate;
         }
 
+        function shufflePhotos(photos) {
+            const pool = photos.slice();
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            return pool;
+        }
+
+        function preloadPhoto(path) {
+            if (!path) return Promise.resolve();
+            if (photoPreloadCache.has(path)) return photoPreloadCache.get(path);
+            const promise = new Promise((resolve) => {
+                const img = new Image();
+                img.decoding = 'async';
+                img.loading = 'eager';
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
+                img.src = path;
+                if (img.decode) {
+                    img.decode().then(resolve).catch(resolve);
+                }
+            });
+            photoPreloadCache.set(path, promise);
+            return promise;
+        }
+
+        async function preloadPhotos(paths, concurrency = 4) {
+            const queue = paths.filter(Boolean);
+            let index = 0;
+
+            async function worker() {
+                while (index < queue.length) {
+                    const path = queue[index];
+                    index += 1;
+                    await preloadPhoto(path);
+                }
+            }
+
+            const workers = Array.from({ length: Math.min(concurrency, queue.length) }, () => worker());
+            await Promise.all(workers);
+        }
+
+        function applyPhotoToElement(element, photoName) {
+            if (!element || !photoName) return;
+            const path = `${PHOTO_BASE_PATH}${photoName}`;
+            preloadPhoto(path).then(() => {
+                element.style.backgroundImage = `url('${path}')`;
+                element.style.backgroundSize = 'cover';
+                element.style.backgroundPosition = 'center';
+            });
+        }
+
         function initPhotoTapeColumns() {
             const columns = document.querySelectorAll('.photo-tape-bg .photo-column');
             columns.forEach(column => {
@@ -2113,6 +2453,41 @@
                 });
                 column.appendChild(track);
             });
+        }
+
+        function ensurePhotoTapeOriginals(photos) {
+            const columns = Array.from(document.querySelectorAll('.photo-tape-bg .photo-column'));
+            if (columns.length === 0) return [];
+
+            let totalOriginals = 0;
+            columns.forEach(column => {
+                const track = column.querySelector('.photo-column-track');
+                if (!track) return;
+                totalOriginals += track.querySelectorAll('[data-photo-original="true"]').length;
+            });
+
+            let toAdd = Math.max(0, photos.length - totalOriginals);
+            let columnIndex = 0;
+            while (toAdd > 0) {
+                const column = columns[columnIndex % columns.length];
+                const track = column.querySelector('.photo-column-track');
+                if (track) {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'photo-placeholder';
+                    placeholder.dataset.photoOriginal = 'true';
+                    track.appendChild(placeholder);
+                    toAdd -= 1;
+                }
+                columnIndex += 1;
+            }
+
+            const originals = [];
+            columns.forEach(column => {
+                const track = column.querySelector('.photo-column-track');
+                if (!track) return;
+                originals.push(...track.querySelectorAll('[data-photo-original="true"]'));
+            });
+            return originals;
         }
 
         function rebuildPhotoTapeClones() {
@@ -2140,34 +2515,24 @@
 
             if (photos.length === 0) return; // Use placeholders if no photos
 
-            // Populate background tape columns (no duplicates in a row)
-            const columns = document.querySelectorAll('.photo-tape-bg .photo-column');
-            columns.forEach(column => {
-                const originals = column.querySelectorAll('.photo-column-track [data-photo-original="true"]');
-                let lastPhoto = null;
+            const shuffledPhotos = shufflePhotos(photos);
+            const preloadList = shuffledPhotos.map(name => `${PHOTO_BASE_PATH}${name}`);
+            preloadPhotos(preloadList, 4);
 
-                originals.forEach(placeholder => {
-                    const photo = getRandomPhotoExcluding(photos, lastPhoto);
-                    if (photo) {
-                        placeholder.style.backgroundImage = `url('images/memories/Photos/${photo}')`;
-                        placeholder.style.backgroundSize = 'cover';
-                        placeholder.style.backgroundPosition = 'center';
-                        lastPhoto = photo;
-                    }
-                });
+            // Populate background tape columns with all photos
+            const originals = ensurePhotoTapeOriginals(shuffledPhotos);
+            originals.forEach((placeholder, index) => {
+                const photo = shuffledPhotos[index % shuffledPhotos.length];
+                applyPhotoToElement(placeholder, photo);
             });
 
             rebuildPhotoTapeClones();
 
             // Populate foreground tape grid
             const fgPhotos = document.querySelectorAll('.tape-photo');
-            fgPhotos.forEach(photo => {
-                const img = getRandomPhoto(photos);
-                if (img) {
-                    photo.style.backgroundImage = `url('images/memories/Photos/${img}')`;
-                    photo.style.backgroundSize = 'cover';
-                    photo.style.backgroundPosition = 'center';
-                }
+            fgPhotos.forEach((photo, index) => {
+                const img = shuffledPhotos[index % shuffledPhotos.length];
+                applyPhotoToElement(photo, img);
             });
         }
 
@@ -2362,6 +2727,9 @@
             if (wordleGuessBtn) wordleGuessBtn.disabled = false;
             if (wordleMessage) wordleMessage.textContent = '';
             renderWordleRows();
+            if (wordleInput) {
+                requestAnimationFrame(() => wordleInput.focus());
+            }
         }
 
         function renderWordleRows() {
@@ -2454,8 +2822,9 @@
                 if (wordleInput) wordleInput.disabled = true;
                 if (wordleGuessBtn) wordleGuessBtn.disabled = true;
                 runStreamersFor(2000);
+                const epoch = navEpoch;
                 setTimeout(() => {
-                    if (wordleView && sudokuView) {
+                    if (navEpoch === epoch && currentViewId === 'wordleView' && wordleView && sudokuView) {
                         switchView(wordleView, sudokuView, true);
                         initSudoku();
                     }
@@ -2481,8 +2850,9 @@
                 if (wordleMessage) wordleMessage.textContent = `Out of guesses. The word was ${wordleTarget}.`;
                 if (wordleInput) wordleInput.disabled = true;
                 if (wordleGuessBtn) wordleGuessBtn.disabled = true;
+                const epoch = navEpoch;
                 setTimeout(() => {
-                    if (wordleView && sudokuView) {
+                    if (navEpoch === epoch && currentViewId === 'wordleView' && wordleView && sudokuView) {
                         switchView(wordleView, sudokuView, true);
                         initSudoku();
                     }
@@ -2503,6 +2873,34 @@
             });
         }
 
+        document.addEventListener('keydown', (event) => {
+            if (!wordleView || !wordleView.classList.contains('visible')) return;
+            const activeTag = document.activeElement ? document.activeElement.tagName : '';
+            if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
+            if (!wordleInput || wordleInput.disabled) return;
+
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                handleWordleGuess();
+                return;
+            }
+
+            if (event.key === 'Backspace') {
+                event.preventDefault();
+                wordleInput.value = wordleInput.value.slice(0, -1);
+                return;
+            }
+
+            if (/^[a-zA-Z]$/.test(event.key)) {
+                event.preventDefault();
+                const next = (wordleInput.value + event.key)
+                    .replace(/[^a-zA-Z]/g, '')
+                    .toUpperCase()
+                    .slice(0, 5);
+                wordleInput.value = next;
+            }
+        });
+
         // --- Sudoku logic ---
         let sudokuGridBound = false;
         let sudokuKeypadBound = false;
@@ -2519,7 +2917,7 @@
             if (sudokuGridEl && !sudokuGridBound) {
                 sudokuGridEl.addEventListener('click', (event) => {
                     const cell = event.target.closest('.sudoku-cell');
-                    if (!cell || cell.classList.contains('fixed')) return;
+                    if (!cell) return;
                     const r = Number(cell.dataset.r);
                     const c = Number(cell.dataset.c);
                     sudokuActive = { r, c };
@@ -2547,6 +2945,11 @@
                     if (!sudokuView || !sudokuView.classList.contains('visible')) return;
                     const activeTag = document.activeElement ? document.activeElement.tagName : '';
                     if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
+                    if (event.key.startsWith('Arrow')) {
+                        handleSudokuArrow(event.key);
+                        event.preventDefault();
+                        return;
+                    }
                     if (event.key >= '1' && event.key <= '9') {
                         updateSudokuCell(Number(event.key));
                         event.preventDefault();
@@ -2561,10 +2964,36 @@
             }
         }
 
+        function handleSudokuArrow(key) {
+            const deltaMap = {
+                ArrowUp: [-1, 0],
+                ArrowDown: [1, 0],
+                ArrowLeft: [0, -1],
+                ArrowRight: [0, 1]
+            };
+            const delta = deltaMap[key];
+            if (!delta) return;
+
+            let nextRow = 0;
+            let nextCol = 0;
+            if (sudokuActive) {
+                nextRow = sudokuActive.r + delta[0];
+                nextCol = sudokuActive.c + delta[1];
+            }
+            nextRow = Math.max(0, Math.min(8, nextRow));
+            nextCol = Math.max(0, Math.min(8, nextCol));
+            sudokuActive = { r: nextRow, c: nextCol };
+            renderSudoku();
+        }
+
         function renderSudoku() {
             if (!sudokuGridEl) return;
             const solvedBlocks = getSudokuSolvedBlocks();
+            const conflicts = getSudokuConflicts();
             sudokuGridEl.innerHTML = '';
+            const activeRow = sudokuActive ? sudokuActive.r : null;
+            const activeCol = sudokuActive ? sudokuActive.c : null;
+            const activeBlock = sudokuActive ? (Math.floor(activeRow / 3) * 3 + Math.floor(activeCol / 3)) : null;
             for (let r = 0; r < 9; r++) {
                 for (let c = 0; c < 9; c++) {
                     const val = sudokuState[r][c];
@@ -2573,13 +3002,24 @@
                     cell.className = 'sudoku-cell';
                     cell.dataset.r = String(r);
                     cell.dataset.c = String(c);
+                    const isFixed = SUDOKU_PUZZLE[r][c] !== 0;
 
-                    if (SUDOKU_PUZZLE[r][c] !== 0) {
+                    if (sudokuActive) {
+                        const blockIndex = Math.floor(r / 3) * 3 + Math.floor(c / 3);
+                        if (!isFixed && (r === activeRow || c === activeCol || blockIndex === activeBlock)) {
+                            cell.classList.add('highlight');
+                        }
+                    }
+
+                    if (isFixed) {
                         cell.classList.add('fixed');
                         cell.textContent = String(SUDOKU_PUZZLE[r][c]);
-                        cell.disabled = true;
                     } else {
                         if (val) cell.textContent = String(val);
+                    }
+
+                    if (conflicts.has(`${r},${c}`) && SUDOKU_PUZZLE[r][c] === 0) {
+                        cell.classList.add('conflict');
                     }
 
                     const blockIndex = Math.floor(r / 3) * 3 + Math.floor(c / 3);
@@ -2610,6 +3050,100 @@
             } else {
                 sudokuGridEl.classList.remove('complete');
             }
+
+            updateSudokuKeypadState();
+        }
+
+        function getSudokuConflicts() {
+            const conflicts = new Set();
+
+            for (let r = 0; r < 9; r++) {
+                const seen = new Map();
+                for (let c = 0; c < 9; c++) {
+                    const value = sudokuState[r][c];
+                    if (!value) continue;
+                    if (!seen.has(value)) seen.set(value, []);
+                    seen.get(value).push([r, c]);
+                }
+                seen.forEach((positions) => {
+                    if (positions.length > 1) {
+                        positions.forEach(([rr, cc]) => conflicts.add(`${rr},${cc}`));
+                    }
+                });
+            }
+
+            for (let c = 0; c < 9; c++) {
+                const seen = new Map();
+                for (let r = 0; r < 9; r++) {
+                    const value = sudokuState[r][c];
+                    if (!value) continue;
+                    if (!seen.has(value)) seen.set(value, []);
+                    seen.get(value).push([r, c]);
+                }
+                seen.forEach((positions) => {
+                    if (positions.length > 1) {
+                        positions.forEach(([rr, cc]) => conflicts.add(`${rr},${cc}`));
+                    }
+                });
+            }
+
+            for (let block = 0; block < 9; block++) {
+                const startRow = Math.floor(block / 3) * 3;
+                const startCol = (block % 3) * 3;
+                const seen = new Map();
+                for (let r = startRow; r < startRow + 3; r++) {
+                    for (let c = startCol; c < startCol + 3; c++) {
+                        const value = sudokuState[r][c];
+                        if (!value) continue;
+                        if (!seen.has(value)) seen.set(value, []);
+                        seen.get(value).push([r, c]);
+                    }
+                }
+                seen.forEach((positions) => {
+                    if (positions.length > 1) {
+                        positions.forEach(([rr, cc]) => conflicts.add(`${rr},${cc}`));
+                    }
+                });
+            }
+
+            return conflicts;
+        }
+
+        function getSudokuNumberBlockCoverage() {
+            const coverage = Array(10).fill(false);
+            for (let value = 1; value <= 9; value++) {
+                let allBlocks = true;
+                for (let block = 0; block < 9; block++) {
+                    const startRow = Math.floor(block / 3) * 3;
+                    const startCol = (block % 3) * 3;
+                    let found = false;
+                    for (let r = startRow; r < startRow + 3; r++) {
+                        for (let c = startCol; c < startCol + 3; c++) {
+                            if (sudokuState[r][c] === value) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found) break;
+                    }
+                    if (!found) {
+                        allBlocks = false;
+                        break;
+                    }
+                }
+                coverage[value] = allBlocks;
+            }
+            return coverage;
+        }
+
+        function updateSudokuKeypadState() {
+            if (!sudokuKeypadEl) return;
+            const coverage = getSudokuNumberBlockCoverage();
+            const keys = sudokuKeypadEl.querySelectorAll('.sudoku-key[data-value]');
+            keys.forEach((key) => {
+                const value = Number(key.dataset.value || 0);
+                key.disabled = value >= 1 && value <= 9 ? coverage[value] : false;
+            });
         }
 
         function getSudokuSolvedBlocks() {
@@ -2650,6 +3184,8 @@
             clear.dataset.action = 'clear';
             clear.textContent = 'Clear';
             sudokuKeypadEl.appendChild(clear);
+
+            updateSudokuKeypadState();
         }
 
         function updateSudokuCell(value) {
@@ -2665,8 +3201,9 @@
             if (checkSudokuSolved()) {
                 if (sudokuMessageEl) sudokuMessageEl.textContent = 'Solved! 💕';
                 runStreamersFor(2000);
+                const epoch = navEpoch;
                 setTimeout(() => {
-                    if (sudokuView && minesweeperView) {
+                    if (navEpoch === epoch && currentViewId === 'sudokuView' && sudokuView && minesweeperView) {
                         switchView(sudokuView, minesweeperView, true);
                         initMinesweeper();
                     }
@@ -2829,7 +3366,7 @@
             if (cell.mine) {
                 minesweeperGameOver = true;
                 revealAllMines();
-                if (minesweeperMessageEl) minesweeperMessageEl.textContent = 'Boom! Try again. 💥';
+                if (minesweeperMessageEl) minesweeperMessageEl.textContent = 'Kirkenuinely lock in twin...';
                 return;
             }
 
@@ -2874,8 +3411,11 @@
                 minesweeperGameOver = true;
                 if (minesweeperMessageEl) minesweeperMessageEl.textContent = 'You cleared it! 💕';
                 runStreamersFor(2000);
+                const epoch = navEpoch;
                 setTimeout(() => {
-                    if (minesweeperView && questionView) switchView(minesweeperView, questionView, true);
+                    if (navEpoch === epoch && currentViewId === 'minesweeperView' && minesweeperView && questionView) {
+                        switchView(minesweeperView, questionView, true);
+                    }
                 }, 800);
             }
         }
@@ -3364,7 +3904,7 @@
             // hide the wordsearch and show the Wordle view
             runStreamersFor(2000);
             const wordsearchView = document.getElementById('wordsearchView');
-            if (wordsearchView && wordleView) {
+            if (currentViewId === 'wordsearchView' && wordsearchView && wordleView) {
                 switchView(wordsearchView, wordleView, true);
                 initWordle();
             } else if (questionView) {

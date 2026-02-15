@@ -34,6 +34,7 @@ adore
 adorn
 adult
 aegis
+aediu
 aeons
 affix
 afire
@@ -664,6 +665,7 @@ curry
 curse
 curst
 curve
+cutie
 cycle
 cynic
 daddy
